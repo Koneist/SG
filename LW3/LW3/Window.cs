@@ -36,6 +36,7 @@ namespace LW3
             base.OnLoad();
         }
 
+
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             if (KeyboardState.IsKeyDown(Keys.Escape))
@@ -51,6 +52,12 @@ namespace LW3
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
+            //GL.Viewport(0, 0, Size.X, Size.Y);
+            //GL.MatrixMode(MatrixMode.Projection);
+            //GL.LoadIdentity();
+            //GL.Ortho(0, Size.X, Size.Y, 0, -1, 1);
+            //GL.MatrixMode(MatrixMode.Modelview);
+
             SwapBuffers();
             base.OnResize(e);
         }
@@ -59,6 +66,33 @@ namespace LW3
             GL.Clear(ClearBufferMask.ColorBufferBit);
             SwapBuffers();
             base.OnRenderFrame(args);
+        }
+
+        public void DrawEllipse(Vector2 center, float rx, float ry, Color4 fillColor, Color4 strokeColor)
+        {
+            const float points = 24;
+            const float step = 2 * MathF.PI / points;
+            
+            float[] verteces = new float[(int)(2 * (points + 1))];
+
+            verteces[0] = center.X;
+            verteces[1] = center.Y;
+
+            for (int point = 0, j = 2; point < points; point++, j += 2)
+            {
+                verteces[j] = center.X + rx * MathF.Sin(step * point);
+                verteces[j + 1] = center.Y + ry * MathF.Cos(step * point);
+            }
+
+            for(int i = 0; i < 50; i++)
+            {
+                for(int j = 0; j < 2; j++)
+                {
+
+                    Console.Write($"{verteces[i]} ");
+                }
+                Console.WriteLine();
+            }
         }
     }
 }
