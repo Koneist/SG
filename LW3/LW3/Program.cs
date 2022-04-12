@@ -27,19 +27,27 @@ namespace LW3
             {
                 window.DrawEllipse(new Vector2(0, 0), 200f, 200f, Color4.Red, Color4.Gray, 5f);
                 window.DrawEllipse(new Vector2(0, 100), 200f, 150f, Color4.Blue, Color4.Transparent, 1);
-                window.DrawPolygon( new float[]
-                { 
-                    100f, 100f,
-                    200f, 100f,
-                    200f, 200f,
-                    //100f, 200f,
-                }, Color4.Beige, Color4.Black, 5f);
+                //window.DrawPolygon( new float[]
+                //{ 
+                //    100f, 100f,
+                //    200f, 100f,
+                //    200f, 200f,
+                //    //100f, 200f,
+                //}, Color4.Beige, Color4.Black, 5f);
                 window.DrawBrokenLine(new float[]
                 {
                     0, 0, 
                     100, 50,
                     -30, -70,
                 }, Color4.Black, 10f);
+
+                window.DrawCurve(new Vector2[]
+                {
+                    new(100f, 100f),
+                    new(200f, 100f),
+                    new(200f, 200f),
+                    //100f, 200f,
+                }, Color4.Beige, Color4.Black, 5f);
                 window.Run();
             }
         }

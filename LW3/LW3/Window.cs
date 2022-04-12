@@ -177,5 +177,30 @@ namespace LW3
         }
 
 
+        public void DrawCurve(Vector2[] points, Color4 fillColor, Color4 strokeColor, float strokeWidth)
+        {
+            float t = 0.0f; float vertexFrequency = 0.00625f;
+            List<float> vertexBuffer = new();
+            while (MathF.Round(t, 2) <= 1.00f)
+            {
+                int pointCount = points.Length;
+                List<Vector2> _1 = points.ToList();
+                while (pointCount > 1)
+                {
+                    for (int i = 0, j = 1; j < pointCount; i++, j++)
+                        _1[i] = Vector2.Lerp(_1[i], _1[j], t);
+                    pointCount--;
+                }
+
+                vertexBuffer.Add(_1[0].X);
+                vertexBuffer.Add(_1[0].Y);
+
+                t += vertexFrequency;
+            }
+
+            DrawPolygon(vertexBuffer.ToArray(), fillColor, strokeColor, strokeWidth);
+        }
+
+
     }
 }
