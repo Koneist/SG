@@ -25,8 +25,8 @@ namespace LW3
 
             using (var window = Window.StartWindow(nativeWindowSettings))
             {
-                window.DrawEllipse(new Vector2(100, 100), 10, 10, Color4.Transparent, Color4.Transparent);
-                //window.Run();
+                window.DrawEllipse(new Vector2(0, 0), 200f, 200f, Color4.Red, Color4.Red);
+                window.Run();
             }
         }
     }
