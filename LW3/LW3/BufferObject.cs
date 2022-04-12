@@ -27,6 +27,7 @@ namespace LW3
         public int BufferId { private get; set; }
         public bool IsActive { private set; get; }
         public Color4 Color { private get; set; } = Color4.Transparent;
+        public float StrokeWidth { private set; get; }
 
         public PrimitiveType PrimitiveType { private set; get; } = PrimitiveType.Points;
         private readonly BufferTarget _type;
@@ -37,7 +38,7 @@ namespace LW3
             BufferId = GL.GenBuffer();
         }
 
-        public void SetData<T>(T[] data, PrimitiveType primitiveType, Color4 color, BufferHint hint = BufferHint.StaticDraw ) where T : struct
+        public void SetData<T>(T[] data, PrimitiveType primitiveType, Color4 color, float strokeWidth = 1 ,BufferHint hint = BufferHint.StaticDraw ) where T : struct
         {
             if (data.Length == 0)
                 throw new ArgumentException("Empty Array");
@@ -48,11 +49,12 @@ namespace LW3
             Color = color;
             PrimitiveType = primitiveType;
             _dataLength = data.Length;
+            StrokeWidth = strokeWidth;
         }
 
         public void Draw()
         {
-            if (_dataLength == 0 && Color.A == Color4.Transparent.A)
+            if (_dataLength == 0 || Color.A == Color4.Transparent.A)
                 return;
             
             GL.EnableClientState(ArrayCap.VertexArray);
@@ -61,8 +63,10 @@ namespace LW3
 
             GL.VertexPointer(2, VertexPointerType.Float, 0, 0);
             GL.Color4(Color);
-            GL.DrawArrays(PrimitiveType.TriangleFan, 0, _dataLength / 2);
+            GL.LineWidth(StrokeWidth);
+            GL.DrawArrays(PrimitiveType, 0, _dataLength / 2);
             DeActivate();
+            GL.LineWidth(1);
             GL.DisableClientState(ArrayCap.VertexArray);
         }
 

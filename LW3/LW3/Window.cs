@@ -27,7 +27,7 @@ namespace LW3
         };
         private int vertecesBuf;
 
-        private BufferObject? _bufObj = null;
+        private List<BufferObject> _bufObjects;
 
         public Window(GameWindowSettings gameWindowSettings,
                       NativeWindowSettings nativeWindowSettings)
@@ -40,6 +40,7 @@ namespace LW3
             GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.Texture2D);
+            _bufObjects = new();
         }
 
         protected override void OnLoad()
@@ -80,9 +81,9 @@ namespace LW3
 
             GL.Ortho(-e.Width / 2, e.Width / 2, -e.Height / 2, e.Height / 2, -1, 1);
 
-            //DrawBuffer();
+            DrawBuffer();
 
-            _bufObj?.Draw();
+            
 
             SwapBuffers();
             base.OnResize(e);
@@ -90,8 +91,8 @@ namespace LW3
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
-            //DrawBuffer();
-            _bufObj?.Draw();
+            DrawBuffer();
+            
             SwapBuffers();
             base.OnRenderFrame(args);
         }
@@ -108,24 +109,30 @@ namespace LW3
 
         private void DrawBuffer()
         {
-            GL.EnableClientState(ArrayCap.VertexArray);
+            
+            foreach (var bufObject in _bufObjects)
+            {
+                bufObject.Draw();
+            }
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertecesBuf);
-            GL.VertexPointer(2, VertexPointerType.Float, 0, 0);
+            //GL.EnableClientState(ArrayCap.VertexArray);
 
-            GL.Color4(Color4.Red);
-            GL.Translate(.1f, .1f, 0f);
-            GL.DrawArrays(PrimitiveType.TriangleFan, 0, (_verteces.Length) / 2);
-            //GL.Color4(Color4.Blue);
-            //GL.LineWidth(5f);
-            //GL.DrawArrays(PrimitiveType.LineStrip, 1, (_verteces.Length - 1) / 2);
+            //GL.BindBuffer(BufferTarget.ArrayBuffer, vertecesBuf);
+            //GL.VertexPointer(2, VertexPointerType.Float, 0, 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.DisableClientState(ArrayCap.VertexArray);
+            //GL.Color4(Color4.Red);
+            //GL.Translate(.1f, .1f, 0f);
+            //GL.DrawArrays(PrimitiveType.TriangleFan, 0, (_verteces.Length) / 2);
+            ////GL.Color4(Color4.Blue);
+            ////GL.LineWidth(5f);
+            ////GL.DrawArrays(PrimitiveType.LineStrip, 1, (_verteces.Length - 1) / 2);
+
+            //GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            //GL.DisableClientState(ArrayCap.VertexArray);
 
         }
 
-        public void DrawEllipse(Vector2 center, float rx, float ry, Color4 fillColor, Color4 strokeColor)
+        public void DrawEllipse(Vector2 center, float rx, float ry, Color4 fillColor, Color4 strokeColor, float strokeWidth)
         {
             const float points = 24;
             const float step = 2 * MathF.PI / points;
@@ -141,8 +148,34 @@ namespace LW3
                 verteces[j + 1] = center.Y + ry * MathF.Cos(step * point);
             }
             
-            _bufObj = new(BufferType.ArrayBuffer);
-            _bufObj.SetData(verteces, PrimitiveType.TriangleFan, fillColor);
+            BufferObject FillCircle = new(BufferType.ArrayBuffer);
+            FillCircle.SetData(verteces, PrimitiveType.TriangleFan, fillColor);
+            BufferObject strokeObject = new(BufferType.ArrayBuffer);
+            strokeObject.SetData(verteces[2..], PrimitiveType.LineStrip, strokeColor, strokeWidth);
+
+            _bufObjects.Add(FillCircle);
+            _bufObjects.Add(strokeObject);
         }
+
+        public void DrawPolygon(float[] points, Color4 fillColor, Color4 strokeColor, float strokeWidth)
+        {
+            BufferObject fillPolygon = new(BufferType.ArrayBuffer);
+            fillPolygon.SetData(points, PrimitiveType.Polygon, fillColor);
+            BufferObject strokePolygon = new(BufferType.ArrayBuffer);
+            strokePolygon.SetData(points, PrimitiveType.LineLoop, strokeColor, strokeWidth);
+
+            _bufObjects.Add(fillPolygon);
+            _bufObjects.Add(strokePolygon);
+        }
+
+        public void DrawBrokenLine(float[] points, Color4 strokeColor, float strokeWidth)
+        {
+            BufferObject strokePolygon = new(BufferType.ArrayBuffer);
+            strokePolygon.SetData(points, PrimitiveType.LineStrip, strokeColor, strokeWidth);
+            _bufObjects.Add(strokePolygon);
+            
+        }
+
+
     }
 }
