@@ -15,6 +15,7 @@ namespace LW3.Shapes
         protected Shape(Color4 strokeColor, float width)
         {
             _strokeColor = strokeColor;
+            _strokeWidth = width;
         }
 
         public Color4 StrokeColor { get => _strokeColor; }

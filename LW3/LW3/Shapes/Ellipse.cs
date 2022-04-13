@@ -9,20 +9,28 @@ namespace LW3.Shapes
 {
     internal class Ellipse : SolidShape
     {
-        public float RadiusX { get; set; } = 5;
-        public float RadiusY { get; set; } = 5;
-        public Vector2 Center { get; set; }
-        public Ellipse(Vector2 center, float radiusX, float radiusY, Color4 fillColor, Color4 strokeColor, float strokeWidth = 0)
+        private float _radiusX;
+        private float _radiusY;
+        private float _centerX;
+        private float _centerY;
+        public Ellipse(float centerX,
+                       float centerY,
+                       float radiusX,
+                       float radiusY,
+                       Color4 fillColor,
+                       Color4? strokeColor = null,
+                       float strokeWidth = 1)
             : base(fillColor, strokeColor, strokeWidth)
         {
-            RadiusX = radiusX;
-            RadiusY = radiusY;
-            Center = center;
+            _radiusX = radiusX;
+            _radiusY = radiusY;
+            _centerX = centerX;
+            _centerY = centerY;
         }
 
         public override void Draw(Window canvas)
         {
-            throw new NotImplementedException();
+            canvas.DrawEllipse(_centerX, _centerY, _radiusX, _radiusY, _fillColor, _strokeColor, _strokeWidth);
         }
     }
 }

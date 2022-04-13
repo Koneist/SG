@@ -13,8 +13,8 @@ namespace LW3.Shapes
 
         public Curve(float[] vertices,
                        Color4 fillColor,
-                       Color4 strokeColor,
-                       float strokeWidth)
+                       Color4? strokeColor = null,
+                       float strokeWidth = 1)
             : base(fillColor, strokeColor, strokeWidth)
         {
             _vertices = vertices;
@@ -22,7 +22,7 @@ namespace LW3.Shapes
 
         public override void Draw(Window canvas)
         {
-            throw new NotImplementedException();
+            canvas.DrawCurve(_vertices, _fillColor, _strokeColor, _strokeWidth);
         }
     }
 }

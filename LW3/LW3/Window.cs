@@ -18,15 +18,6 @@ namespace LW3
             return new Window(GameWindowSettings.Default, nativeWindowSettings);
         }
 
-        private float[] _verteces = new float[] 
-        {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-        };
-        private int vertecesBuf;
-
         private List<BufferObject> _bufObjects;
 
         public Window(GameWindowSettings gameWindowSettings,
@@ -45,12 +36,14 @@ namespace LW3
 
         protected override void OnLoad()
         {
-            
-            //vertecesBuf = CreateBuffer(_verteces);
-
-            //GL.CullFace(CullFaceMode.Back);
-            //GL.PolygonMode(MaterialFace.Front, PolygonMode.Line);
             base.OnLoad();
+        }
+
+        protected override void OnUnload()
+        {
+            foreach(var obj in _bufObjects)
+                obj.Dispose();
+            base.OnUnload();
         }
 
 
@@ -68,12 +61,6 @@ namespace LW3
         protected override void OnResize(ResizeEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
-
-            //GL.Viewport(0, 0, Size.X, Size.Y);
-            //GL.MatrixMode(MatrixMode.Projection);
-            //GL.LoadIdentity();
-            //GL.Ortho(0, Size.X, Size.Y, 0, -1, 1);
-            //GL.MatrixMode(MatrixMode.Modelview);
 
             GL.Viewport(0, 0, e.Width, e.Height);
             GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -97,16 +84,6 @@ namespace LW3
             base.OnRenderFrame(args);
         }
 
-        private int CreateBuffer(float[] data)
-        {
-            int buffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, _verteces.Length * sizeof(float), data, BufferUsageHint.StaticDraw);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            return buffer;
-        }
-
         private void DrawBuffer()
         {
             
@@ -115,92 +92,101 @@ namespace LW3
                 bufObject.Draw();
             }
 
-            //GL.EnableClientState(ArrayCap.VertexArray);
-
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, vertecesBuf);
-            //GL.VertexPointer(2, VertexPointerType.Float, 0, 0);
-
-            //GL.Color4(Color4.Red);
-            //GL.Translate(.1f, .1f, 0f);
-            //GL.DrawArrays(PrimitiveType.TriangleFan, 0, (_verteces.Length) / 2);
-            ////GL.Color4(Color4.Blue);
-            ////GL.LineWidth(5f);
-            ////GL.DrawArrays(PrimitiveType.LineStrip, 1, (_verteces.Length - 1) / 2);
-
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            //GL.DisableClientState(ArrayCap.VertexArray);
-
         }
 
-        public void DrawEllipse(Vector2 center, float rx, float ry, Color4 fillColor, Color4 strokeColor, float strokeWidth)
+        public void DrawEllipse(float centerX, float centerY, float rx, float ry, Color4 fillColor, Color4 strokeColor, float strokeWidth)
         {
-            const float points = 24;
+            const float points = 50;
             const float step = 2 * MathF.PI / points;
             
             float[] verteces = new float[(int)(2 * (points + 2))];
 
-            verteces[0] = center.X;
-            verteces[1] = center.Y;
+            verteces[0] = centerX;
+            verteces[1] = centerY;
 
             for (int point = 0, j = 2; point <= points; point++, j += 2)
             {
-                verteces[j] = center.X + rx * MathF.Sin(step * point);
-                verteces[j + 1] = center.Y + ry * MathF.Cos(step * point);
+                verteces[j] = centerX + rx * MathF.Sin(step * point);
+                verteces[j + 1] = centerY + ry * MathF.Cos(step * point);
             }
-            
-            BufferObject FillCircle = new(BufferType.ArrayBuffer);
-            FillCircle.SetData(verteces, PrimitiveType.TriangleFan, fillColor);
-            BufferObject strokeObject = new(BufferType.ArrayBuffer);
-            strokeObject.SetData(verteces[2..], PrimitiveType.LineStrip, strokeColor, strokeWidth);
 
-            _bufObjects.Add(FillCircle);
-            _bufObjects.Add(strokeObject);
+            //BufferObject FillCircle = new(BufferType.ArrayBuffer);
+            //FillCircle.SetData(verteces, PrimitiveType.TriangleFan, fillColor);
+            //BufferObject strokeObject = new(BufferType.ArrayBuffer);
+            //strokeObject.SetData(verteces[2..], PrimitiveType.LineStrip, strokeColor, strokeWidth);
+
+            //_bufObjects.Add(FillCircle);
+            //_bufObjects.Add(strokeObject);
+            CreateBufferObject(verteces, PrimitiveType.TriangleFan, fillColor);
+            CreateBufferObject(verteces[2..], PrimitiveType.LineStrip, strokeColor, strokeWidth);
         }
 
         public void DrawPolygon(float[] points, Color4 fillColor, Color4 strokeColor, float strokeWidth)
         {
-            BufferObject fillPolygon = new(BufferType.ArrayBuffer);
-            fillPolygon.SetData(points, PrimitiveType.Polygon, fillColor);
-            BufferObject strokePolygon = new(BufferType.ArrayBuffer);
-            strokePolygon.SetData(points, PrimitiveType.LineLoop, strokeColor, strokeWidth);
+            //BufferObject fillPolygon = new(BufferType.ArrayBuffer);
+            //fillPolygon.SetData(points, PrimitiveType.Polygon, fillColor);
+            //BufferObject strokePolygon = new(BufferType.ArrayBuffer);
+            //strokePolygon.SetData(points, PrimitiveType.LineLoop, strokeColor, strokeWidth);
 
-            _bufObjects.Add(fillPolygon);
-            _bufObjects.Add(strokePolygon);
+            //_bufObjects.Add(fillPolygon);
+            //_bufObjects.Add(strokePolygon);
+            CreateBufferObject(points, PrimitiveType.Polygon, fillColor);
+            CreateBufferObject(points, PrimitiveType.LineLoop, strokeColor, strokeWidth);
         }
 
-        public void DrawBrokenLine(float[] points, Color4 strokeColor, float strokeWidth)
+        public void DrawBrokenLine(float[] verteces, Color4 strokeColor, float strokeWidth)
         {
-            BufferObject strokePolygon = new(BufferType.ArrayBuffer);
-            strokePolygon.SetData(points, PrimitiveType.LineStrip, strokeColor, strokeWidth);
-            _bufObjects.Add(strokePolygon);
-            
+            //BufferObject strokePolygon = new(BufferType.ArrayBuffer);
+            //strokePolygon.SetData(points, PrimitiveType.LineStrip, strokeColor, strokeWidth);
+            //_bufObjects.Add(strokePolygon);
+            CreateBufferObject(verteces, PrimitiveType.LineStrip, strokeColor, strokeWidth);
         }
 
 
-        public void DrawCurve(Vector2[] points, Color4 fillColor, Color4 strokeColor, float strokeWidth)
+        public void DrawCurve(float[] points, Color4 fillColor, Color4 strokeColor, float strokeWidth)
         {
+            var vectorPoints = PointsBufferToVertex(points);
             float t = 0.0f; float vertexFrequency = 0.00625f;
-            List<float> vertexBuffer = new();
+            List<float> newVerteces = new();
             while (MathF.Round(t, 2) <= 1.00f)
             {
-                int pointCount = points.Length;
-                List<Vector2> _1 = points.ToList();
+                int pointCount = vectorPoints.Count;
+                List<Vector2> temp = vectorPoints.ToList();
                 while (pointCount > 1)
                 {
                     for (int i = 0, j = 1; j < pointCount; i++, j++)
-                        _1[i] = Vector2.Lerp(_1[i], _1[j], t);
+                        temp[i] = Vector2.Lerp(temp[i], temp[j], t);
                     pointCount--;
                 }
 
-                vertexBuffer.Add(_1[0].X);
-                vertexBuffer.Add(_1[0].Y);
+                newVerteces.Add(temp[0].X);
+                newVerteces.Add(temp[0].Y);
 
                 t += vertexFrequency;
             }
 
-            DrawPolygon(vertexBuffer.ToArray(), fillColor, strokeColor, strokeWidth);
+            DrawPolygon(newVerteces.ToArray(), fillColor, strokeColor, strokeWidth);
+        }
+        
+        private void CreateBufferObject(float[] verteces, PrimitiveType primitiveType, Color4 color, float strokeWidth = 1)
+        {
+            if (verteces.Length == 0 || color.A == Color4.Transparent.A)
+                return;
+
+            BufferObject buffer = new(BufferType.ArrayBuffer);
+            buffer.SetData(verteces, primitiveType, color, strokeWidth);
+
+            _bufObjects.Add(buffer);
         }
 
-
+        private List<Vector2> PointsBufferToVertex(float[] verteces)
+        {
+            var newBuffer = new List<Vector2>(verteces.Length / 2);
+            for(int i = 0; i < verteces.Length; i += 2)
+            {
+                newBuffer.Add(new(verteces[i], verteces[i + 1]));
+            }
+            return newBuffer;
+        }
     }
 }

@@ -43,9 +43,10 @@ namespace LW3
             if (data.Length == 0)
                 throw new ArgumentException("Empty Array");
             Activate();
+            
             GL.BufferData(_type, (IntPtr)(data.Length * Marshal.SizeOf(typeof(T))), data, (BufferUsageHint)hint);
 
-            DeActivate();
+            Deactivate();
             Color = color;
             PrimitiveType = primitiveType;
             _dataLength = data.Length;
@@ -58,25 +59,27 @@ namespace LW3
                 return;
             
             GL.EnableClientState(ArrayCap.VertexArray);
-            if (!IsActive)
-                Activate();
+            
+            Activate();
 
             GL.VertexPointer(2, VertexPointerType.Float, 0, 0);
             GL.Color4(Color);
             GL.LineWidth(StrokeWidth);
             GL.DrawArrays(PrimitiveType, 0, _dataLength / 2);
-            DeActivate();
+            
+            Deactivate();
+            
             GL.LineWidth(1);
             GL.DisableClientState(ArrayCap.VertexArray);
         }
 
-        public void Activate()
+        private void Activate()
         {
             IsActive = true;
             GL.BindBuffer(_type, BufferId);
         }
 
-        public void DeActivate()
+        private void Deactivate()
         {
             IsActive = false;
             GL.BindBuffer(_type, 0); 
@@ -87,7 +90,7 @@ namespace LW3
             if (BufferId == _errorCode)
                 return;
 
-            DeActivate();
+            Deactivate();
             GL.DeleteBuffer(BufferId);
 
             BufferId = _errorCode;

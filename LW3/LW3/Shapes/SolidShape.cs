@@ -12,8 +12,8 @@ namespace LW3.Shapes
         protected Color4 _fillColor = Color4.Transparent;
 
 
-        protected SolidShape(Color4 fillColor, Color4 strokeColor, float strokeWidth)
-            : base(strokeColor, strokeWidth)
+        protected SolidShape(Color4 fillColor, Color4? strokeColor = null, float strokeWidth = 1)
+            : base(strokeColor == null ? Color4.Transparent : strokeColor.Value, strokeWidth)
         {
             _fillColor = fillColor;
         }

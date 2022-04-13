@@ -21,7 +21,7 @@ namespace LW3.Shapes
 
         public override void Draw(Window canvas)
         {
-            throw new NotImplementedException();
+            canvas.DrawBrokenLine(_vertices, _strokeColor, _strokeWidth);
         }
     }
 }
