@@ -23,6 +23,7 @@ namespace lw4
         private Matrix4 _cameraMatrix = Matrix4.LookAt(new(0, 0, 2),
                                                        new(0, 0, 0),
                                                        new(0, 2, 0));
+        private bool _leftMouseBtnPressed = false;
 
         public static Window StartWindow(NativeWindowSettings nativeWindowSettings)
         {
@@ -38,6 +39,7 @@ namespace lw4
 
         protected override void OnLoad()
         {
+            GL.ClearColor(Color4.White);
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Ccw);
@@ -67,6 +69,7 @@ namespace lw4
             GL.LoadMatrix(ref proj);
             GL.MatrixMode(MatrixMode.Modelview);
 
+
             base.OnResize(e);
         }
 
@@ -78,10 +81,60 @@ namespace lw4
             SwapBuffers();
             base.OnRenderFrame(args);
         }
-
-        void Draw()
+        protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            GL.ClearColor(Color4.White);
+            base.OnMouseDown(e);
+            if (e.Button == MouseButton.Button1)
+            {
+                _leftMouseBtnPressed = true;
+            }
+        }
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseUp(e);
+            if (e.Button == MouseButton.Button1)
+            {
+                _leftMouseBtnPressed = false;
+            }
+        }
+
+        protected override void OnMouseLeave()
+        {
+            base.OnMouseLeave();
+            _leftMouseBtnPressed = false;
+        }
+
+        protected override void OnMouseMove(MouseMoveEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if (_leftMouseBtnPressed)
+            {
+                float xAngle = e.DeltaY * MathF.PI / Size.Y;
+                float yAngle = e.DeltaX * MathF.PI / Size.X;
+                RotateCamera(xAngle, yAngle);
+            }
+        }
+
+        private void RotateCamera(float xAngle, float yAngle)
+        {
+            Vector3 xAxis = new(_cameraMatrix.M11, _cameraMatrix.M21, _cameraMatrix.M31);
+            Vector3 yAxis = new(_cameraMatrix.M12, _cameraMatrix.M22, _cameraMatrix.M32);
+
+            _cameraMatrix *= Matrix4.CreateRotationX(xAngle);
+            _cameraMatrix *= Matrix4.CreateRotationY(yAngle);
+            
+            //GL.PushMatrix();
+            //GL.LoadIdentity();
+            //GL.LoadMatrix(ref _cameraMatrix);
+            //GL.Rotate(xAngle, xAxis);
+            //GL.PopMatrix();
+
+            //_cameraMatrix = Orthonormalize(_cameraMatrix);
+        }
+
+        private void Draw()
+        {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.MatrixMode(MatrixMode.Modelview);

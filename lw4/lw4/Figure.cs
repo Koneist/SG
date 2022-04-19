@@ -46,25 +46,32 @@ namespace lw4
         {
             _size = size;
         }
+        private Matrix4 rotationMatrix = Matrix4.Identity;
         public void Draw()
         {
-            const int faceCount = 6;
 
             GL.PushMatrix();
+            
             GL.Scale(_size * 0.5f, _size * 0.5f, _size * 0.5f);
-
-            GL.Begin(BeginMode.Quads);
+            GL.EnableClientState(ArrayCap.VertexArray);
+            List<float> verteces = new();
+            for (int pointer = 0; pointer < _faces.Length; pointer += 1)
             {
-                for(int face = 0; face < faceCount; face += 3)
-                {
-                    GL.Color4(_color);
-                    
-                    
-                    GL.Vertex3(new Vector3(_verteces[face], _verteces[face + 1], _verteces[face + 2])); 
-                    
-                }
+                var vertex = _faces[pointer];
+                verteces.Add(_verteces[vertex * 3]);
+                verteces.Add(_verteces[vertex * 3 + 1]);
+                verteces.Add(_verteces[vertex * 3 + 2]);
+
             }
-            GL.End();
+
+            GL.VertexPointer(3, VertexPointerType.Float, 0, verteces.ToArray());
+            GL.LineWidth(3);
+            GL.Color4(Color4.Red);
+            GL.DrawArrays(PrimitiveType.LineLoop, 0, verteces.Count / 3 - 16);
+            GL.Color4(_color);
+            GL.DrawArrays(PrimitiveType.Quads, 0, verteces.Count / 3);
+            GL.DisableClientState(ArrayCap.VertexArray);
+
 
             GL.PopMatrix();
         }
