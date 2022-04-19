@@ -9,10 +9,12 @@ using OpenTK.Mathematics;
 
 namespace LW3
 {
-    internal class Picture : IDrawable
+    internal class Picture
     {
         private List<Shape> _shapes;
-
+        
+        public List<Shape> Shapes {  get => _shapes; }
+        public int ShapeCount { get => _shapes.Count; }
         public Picture()
         {
             _shapes = new List<Shape>();
@@ -33,7 +35,7 @@ namespace LW3
             _shapes.Add(shape);
         }
 
-        public void Draw(Window canvas)
+        private void Draw(Window canvas)
         {
             foreach (var shape in _shapes)
                 shape.Draw(canvas);

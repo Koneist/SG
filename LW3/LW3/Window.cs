@@ -8,17 +8,34 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
+using LW3.Shapes;
 
 namespace LW3
 {
     internal class Window : GameWindow
     {
+        private class PictureDraw
+        {
+            public List<BufferObject> _bufObjects;
+            public Vector3 scale;
+            public Vector3 translation;
+
+            public PictureDraw(List<BufferObject> bufObjects, Vector3 scale, Vector3 translation)
+            {
+                _bufObjects = bufObjects;
+                this.scale = scale;
+                this.translation = translation;
+            }
+        }
         public static Window StartWindow(NativeWindowSettings nativeWindowSettings)
         {
             return new Window(GameWindowSettings.Default, nativeWindowSettings);
         }
 
         private List<BufferObject> _bufObjects;
+        private List<PictureDraw> _pictureDraws;
+        private float _baseWidth;
+        private float _baseHeight;
 
         public Window(GameWindowSettings gameWindowSettings,
                       NativeWindowSettings nativeWindowSettings)
@@ -32,6 +49,19 @@ namespace LW3
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.Texture2D);
             _bufObjects = new();
+            _pictureDraws = new();
+
+            _baseWidth = nativeWindowSettings.Size.X;
+            _baseHeight = nativeWindowSettings.Size.Y;
+        }
+
+        public void DrawPicture(Picture picture, Vector3 scale, Vector3 translation)
+        {
+            _pictureDraws.Add(new(new(), scale, translation));
+            foreach(var shape in picture.Shapes)
+            { 
+                shape.Draw(this);
+            }
         }
 
         protected override void OnLoad()
@@ -60,17 +90,27 @@ namespace LW3
 
         protected override void OnResize(ResizeEventArgs e)
         {
+            //прочесть про матрицы проецирования
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
+            GL.MatrixMode(MatrixMode.Projection);
+
+            
             GL.Viewport(0, 0, e.Width, e.Height);
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();
 
+            float scaleX = e.Width / _baseWidth;
+            float scaleY = e.Height / _baseHeight;
+
+            float scale = scaleY > scaleX ? scaleX : scaleY;
+
+            GL.Scale(scale, scale, 1);
+
             GL.Ortho(-e.Width / 2, e.Width / 2, -e.Height / 2, e.Height / 2, -1, 1);
-
-            DrawBuffer();
-
             
+            GL.MatrixMode(MatrixMode.Modelview);
+            DrawBuffer();
 
             SwapBuffers();
             base.OnResize(e);
@@ -87,11 +127,17 @@ namespace LW3
         private void DrawBuffer()
         {
             
-            foreach (var bufObject in _bufObjects)
+            foreach(var picture in _pictureDraws)
             {
-                bufObject.Draw();
+                GL.PushMatrix();
+                GL.Translate(picture.translation);
+                GL.Scale(picture.scale);
+                foreach (var bufObject in picture._bufObjects)
+                {
+                    bufObject.Draw();
+                }
+                GL.PopMatrix();
             }
-
         }
 
         public void DrawEllipse(float centerX, float centerY, float rx, float ry, Color4 fillColor, Color4 strokeColor, float strokeWidth)
@@ -110,35 +156,18 @@ namespace LW3
                 verteces[j + 1] = centerY + ry * MathF.Cos(step * point);
             }
 
-            //BufferObject FillCircle = new(BufferType.ArrayBuffer);
-            //FillCircle.SetData(verteces, PrimitiveType.TriangleFan, fillColor);
-            //BufferObject strokeObject = new(BufferType.ArrayBuffer);
-            //strokeObject.SetData(verteces[2..], PrimitiveType.LineStrip, strokeColor, strokeWidth);
-
-            //_bufObjects.Add(FillCircle);
-            //_bufObjects.Add(strokeObject);
             CreateBufferObject(verteces, PrimitiveType.TriangleFan, fillColor);
             CreateBufferObject(verteces[2..], PrimitiveType.LineStrip, strokeColor, strokeWidth);
         }
 
         public void DrawPolygon(float[] points, Color4 fillColor, Color4 strokeColor, float strokeWidth)
         {
-            //BufferObject fillPolygon = new(BufferType.ArrayBuffer);
-            //fillPolygon.SetData(points, PrimitiveType.Polygon, fillColor);
-            //BufferObject strokePolygon = new(BufferType.ArrayBuffer);
-            //strokePolygon.SetData(points, PrimitiveType.LineLoop, strokeColor, strokeWidth);
-
-            //_bufObjects.Add(fillPolygon);
-            //_bufObjects.Add(strokePolygon);
             CreateBufferObject(points, PrimitiveType.Polygon, fillColor);
             CreateBufferObject(points, PrimitiveType.LineLoop, strokeColor, strokeWidth);
         }
 
         public void DrawBrokenLine(float[] verteces, Color4 strokeColor, float strokeWidth)
         {
-            //BufferObject strokePolygon = new(BufferType.ArrayBuffer);
-            //strokePolygon.SetData(points, PrimitiveType.LineStrip, strokeColor, strokeWidth);
-            //_bufObjects.Add(strokePolygon);
             CreateBufferObject(verteces, PrimitiveType.LineStrip, strokeColor, strokeWidth);
         }
 
@@ -176,7 +205,7 @@ namespace LW3
             BufferObject buffer = new(BufferType.ArrayBuffer);
             buffer.SetData(verteces, primitiveType, color, strokeWidth);
 
-            _bufObjects.Add(buffer);
+            _pictureDraws.Last()._bufObjects.Add(buffer);
         }
 
         private List<Vector2> PointsBufferToVertex(float[] verteces)

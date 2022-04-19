@@ -9,8 +9,8 @@ namespace LW3
     {
         private const int MAJOR_VER = 4;
         private const int MINOR_VER = 6;
-        private const int DEFAULT_WIDTH = 1280;
-        private const int DEFAULT_HEIGHT = 1280;
+        private const int DEFAULT_WIDTH = 1000;
+        private const int DEFAULT_HEIGHT = 1000;
         static void Main(string[] args)
         {
             var nativeWindowSettings = new NativeWindowSettings()
@@ -25,31 +25,11 @@ namespace LW3
 
             using (var window = Window.StartWindow(nativeWindowSettings))
             {
-                //window.DrawEllipse(new Vector2(0, 0), 200f, 200f, Color4.Red, Color4.Gray, 5f);
-                //window.DrawEllipse(new Vector2(0, 100), 200f, 150f, Color4.Blue, Color4.Transparent, 1);
-                ////window.DrawPolygon( new float[]
-                ////{ 
-                ////    100f, 100f,
-                ////    200f, 100f,
-                ////    200f, 200f,
-                ////    //100f, 200f,
-                ////}, Color4.Beige, Color4.Black, 5f);
-                //window.DrawBrokenLine(new float[]
-                //{
-                //    0, 0, 
-                //    100, 50,
-                //    -30, -70,
-                //}, Color4.Black, 10f);
-
-                //window.DrawCurve(new Vector2[]
-                //{
-                //    new(100f, 100f),
-                //    new(200f, 100f),
-                //    new(200f, 200f),
-                //    //100f, 200f,
-                //}, Color4.Beige, Color4.Black, 5f);
-
-                Picture.Kopatych.Draw(window);
+                //window.SetTransform();
+                window.DrawPicture(Picture.Kopatych, new Vector3(0.5f,0.5f,1), new Vector3(300, -300, 1));
+                window.DrawPicture(Picture.Kopatych, new Vector3(1.5f, 1, 1), new Vector3(-100, 200, 1));
+                //Picture.Kopatych.Draw(window);
+                //window.FuckGoBack();
                 window.Run();
             }
         }
