@@ -42,7 +42,7 @@ namespace lw4
 		    0, 3, 2, 1, // грань z<0
 		    4, 5, 6, 7, // грань z>0
         };
-        Figure(float size = 1)
+        public Figure(float size = 1)
         {
             _size = size;
         }
