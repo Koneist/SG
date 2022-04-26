@@ -85,6 +85,10 @@ namespace lw4
                     AddVertex(verteces, _verteces[face[i - 1]]);
                     AddVertex(verteces, _verteces[face[i]]);
 
+                    var v0 = _verteces[face[i - 1]] - _verteces[startVertex];
+                    var v1 = _verteces[face[i]] - _verteces[startVertex];
+                    var normal = Vector3.Cross(v0, v1).Normalized();
+
                     AddColor(colors, color);
                     AddColor(colors, color);
                     AddColor(colors, color);
