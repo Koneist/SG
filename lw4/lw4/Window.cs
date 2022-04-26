@@ -34,7 +34,6 @@ namespace lw4
                       NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
         {
-            _figure.SetSideColor(0, Color4.Black);
         }
 
         protected override void OnLoad()
@@ -121,15 +120,15 @@ namespace lw4
             Vector3 xAxis = new(_cameraMatrix.M11, _cameraMatrix.M21, _cameraMatrix.M31);
             Vector3 yAxis = new(_cameraMatrix.M12, _cameraMatrix.M22, _cameraMatrix.M32);
 
-            _cameraMatrix *= Matrix4.CreateRotationX(xAngle);
-            _cameraMatrix *= Matrix4.CreateRotationY(yAngle);
-            
+            //_cameraMatrix *= Matrix4.CreateFromAxisAngle(xAxis, xAngle);
+            //_cameraMatrix *= Matrix4.CreateFromAxisAngle(yAxis, yAngle);
             //GL.PushMatrix();
             //GL.LoadIdentity();
             //GL.LoadMatrix(ref _cameraMatrix);
             //GL.Rotate(xAngle, xAxis);
             //GL.PopMatrix();
-
+            _figure.Rotate(xAngle, xAxis);
+            _figure.Rotate(yAngle, yAxis);
             //_cameraMatrix = Orthonormalize(_cameraMatrix);
         }
 

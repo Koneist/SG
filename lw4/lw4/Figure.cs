@@ -19,68 +19,125 @@ namespace lw4
     }
     internal class Figure
     {
+        private static readonly float _fi = (1f + MathF.Sqrt(5)) / 2f;
+        private static Random _random = new(0);
         private float _size;
-        private Color4 _color;
-        private static readonly float[] _verteces = new float[]
+
+        private float[] _vertexBuffer;
+        private float[] _colorBuffer;
+        private float[] _normalBuffer;
+        private Vector4 _specularColor = new(0, 0, 0, 1);
+        private float _shininess = 1;
+
+        private List<Vector3> _verteces = new()
         {
-            -1, -1, -1, // 0
-		    +1, -1, -1, // 1
-		    +1, +1, -1, // 2
-		    -1, +1, -1, // 3
-		    -1, -1, +1, // 4
-		    +1, -1, +1, // 5
-		    +1, +1, +1, // 6
-		    -1, +1, +1, // 7
+            new(-1, -1, -1),          // 0
+            new(+1, -1, -1),          // 1
+            new(+1, +1, -1),          // 2
+            new(-1, +1, -1),          // 3
+            new(-1, -1, +1),          // 4
+            new(+1, -1, +1),          // 5
+            new(+1, +1, +1),          // 6
+            new(-1, +1, +1),          // 7
+            new(0, +_fi, +(1 / _fi)), // 8 
+            new(0, +_fi, -(1 / _fi)), // 9
+            new(0, -_fi, +(1 / _fi)), // 10
+            new(0, -_fi, -(1 / _fi)), // 11
+            new(+(1 / _fi), 0, +_fi), // 12 
+            new(+(1 / _fi), 0, -_fi), // 13
+            new(-(1 / _fi), 0, +_fi), // 14
+            new(-(1 / _fi), 0, -_fi), // 15
+            new(+_fi, +(1 / _fi), 0), // 16
+            new(+_fi, -(1 / _fi), 0), // 17
+            new(-_fi, +(1 / _fi), 0), // 18
+            new(-_fi, -(1 / _fi), 0)  // 19
         };
-        // Массив координат вершин
-        private static readonly int[] _faces = new int[]
+
+        private List<int[]> _faces = new()
         {
-            4, 7, 3, 0, // грань x<0
-		    5, 1, 2, 6, // грань x>0
-		    4, 0, 1, 5, // грань y<0
-		    7, 6, 2, 3, // грань y>0
-		    0, 3, 2, 1, // грань z<0
-		    4, 5, 6, 7, // грань z>0
+            new int[] { 0, 15, 13, 1, 11 }, // 0
+            new int[] { 0, 11, 10, 4, 19 }, // 1
+            new int[] { 0, 19, 18, 3, 15 }, // 2
+            new int[] { 1, 17, 5, 10, 11 }, // 3
+            new int[] { 1, 13, 2, 16, 17 }, // 4
+            new int[] { 2, 9, 8, 6, 16 }, // 7
+            new int[] { 2, 13, 15, 3, 9 }, // 8
+            new int[] { 3, 18, 7, 8, 9 }, // 11
+            new int[] { 4, 14, 7, 18, 19 }, // 13
+            new int[] { 4, 10, 5, 12, 14 }, // 14
+            new int[] { 5, 17, 16, 6, 12 }, // 16
+            new int[] { 6, 8, 7, 14, 12 }, // 20 
         };
+
         public Figure(float size = 1)
         {
             _size = size;
-        }
-        private Matrix4 rotationMatrix = Matrix4.Identity;
-        public void Draw()
-        {
 
-            GL.PushMatrix();
-            
-            GL.Scale(_size * 0.5f, _size * 0.5f, _size * 0.5f);
-            GL.EnableClientState(ArrayCap.VertexArray);
             List<float> verteces = new();
-            for (int pointer = 0; pointer < _faces.Length; pointer += 1)
+            List<float> colors = new();
+            foreach (var face in _faces)
             {
-                var vertex = _faces[pointer];
-                verteces.Add(_verteces[vertex * 3]);
-                verteces.Add(_verteces[vertex * 3 + 1]);
-                verteces.Add(_verteces[vertex * 3 + 2]);
+                var startVertex = face[0];
+                Color4 color = new((float)_random.NextDouble(), 0, 0, 1);
+                for (int i = 2; i < face.Length; ++i)
+                {
+                    AddVertex(verteces, _verteces[startVertex]);
+                    AddVertex(verteces, _verteces[face[i - 1]]);
+                    AddVertex(verteces, _verteces[face[i]]);
 
+                    AddColor(colors, color);
+                    AddColor(colors, color);
+                    AddColor(colors, color);
+                }
             }
 
-            GL.VertexPointer(3, VertexPointerType.Float, 0, verteces.ToArray());
-            GL.LineWidth(3);
-            GL.Color4(Color4.Red);
-            GL.DrawArrays(PrimitiveType.LineLoop, 0, verteces.Count / 3 - 16);
-            GL.Color4(_color);
-            GL.DrawArrays(PrimitiveType.Quads, 0, verteces.Count / 3);
+            _vertexBuffer = verteces.ToArray();
+            _colorBuffer = colors.ToArray();
+        }
+
+        private Matrix4 _rotateMatrix = Matrix4.Identity;
+        public void Rotate(float angle, Vector3 axis)
+        {
+            _rotateMatrix *= Matrix4.CreateFromAxisAngle(axis, angle);
+        }
+        public void Draw()
+        {
+            GL.Enable(EnableCap.ColorMaterial);
+            GL.ColorMaterial(MaterialFace.FrontAndBack, ColorMaterialParameter.AmbientAndDiffuse);
+            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Specular, _specularColor);
+            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Shininess, _shininess);
+
+            GL.PushMatrix();
+            GL.MultMatrix(ref _rotateMatrix);
+            GL.Scale(_size * 0.5f, _size * 0.5f, _size * 0.5f);
+
+            GL.EnableClientState(ArrayCap.VertexArray);
+            GL.VertexPointer(3, VertexPointerType.Float, 0, _vertexBuffer);
+
+            GL.EnableClientState(ArrayCap.ColorArray);
+            GL.ColorPointer(4, ColorPointerType.Float, 0, _colorBuffer);
+
+            GL.DrawArrays(PrimitiveType.Triangles, 0, _vertexBuffer.Length / 3);
             GL.DisableClientState(ArrayCap.VertexArray);
+            GL.DisableClientState(ArrayCap.ColorArray);
 
 
             GL.PopMatrix();
         }
 
-        public void SetSideColor(CubeSide side, Color4 color)
+        private void AddVertex(List<float> buffer, Vector3 vertex)
         {
-            _color = color;
-            
+            buffer.Add(vertex.X);
+            buffer.Add(vertex.Y);
+            buffer.Add(vertex.Z);
         }
 
+        private void AddColor(List<float> buffer, Color4 color)
+        {
+            buffer.Add(color.R);
+            buffer.Add(color.G);
+            buffer.Add(color.B);
+            buffer.Add(color.A);
+        }
     }
 }
