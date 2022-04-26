@@ -55,18 +55,18 @@ namespace lw4
 
         private List<int[]> _faces = new()
         {
-            new int[] { 0, 15, 13, 1, 11 }, // 0
-            new int[] { 0, 11, 10, 4, 19 }, // 1
-            new int[] { 0, 19, 18, 3, 15 }, // 2
-            new int[] { 1, 17, 5, 10, 11 }, // 3
-            new int[] { 1, 13, 2, 16, 17 }, // 4
-            new int[] { 2, 9, 8, 6, 16 }, // 7
-            new int[] { 2, 13, 15, 3, 9 }, // 8
-            new int[] { 3, 18, 7, 8, 9 }, // 11
-            new int[] { 4, 14, 7, 18, 19 }, // 13
-            new int[] { 4, 10, 5, 12, 14 }, // 14
-            new int[] { 5, 17, 16, 6, 12 }, // 16
-            new int[] { 6, 8, 7, 14, 12 }, // 20 
+            new [] { 0, 15, 13, 1, 11 }, // 0
+            new [] { 0, 11, 10, 4, 19 }, // 1
+            new [] { 0, 19, 18, 3, 15 }, // 2
+            new [] { 1, 17, 5, 10, 11 }, // 3
+            new [] { 1, 13, 2, 16, 17 }, // 4
+            new [] { 2, 9, 8, 6, 16 }, // 7
+            new [] { 2, 13, 15, 3, 9 }, // 8
+            new [] { 3, 18, 7, 8, 9 }, // 11
+            new [] { 4, 14, 7, 18, 19 }, // 13
+            new [] { 4, 10, 5, 12, 14 }, // 14
+            new [] { 5, 17, 16, 6, 12 }, // 16
+            new [] { 6, 8, 7, 14, 12 }, // 20 
         };
 
         public Figure(float size = 1)
@@ -79,7 +79,7 @@ namespace lw4
             foreach (var face in _faces)
             {
                 var startVertex = face[0];
-                Color4 color = new(1f, 0, 0, 1);
+                Color4 color = new((float)_random.NextDouble(), (float)_random.NextDouble(), (float)_random.NextDouble(), 1);
                 for (int i = 2; i < face.Length; ++i)
                 {
                     AddVertex(verteces, _verteces[startVertex]);

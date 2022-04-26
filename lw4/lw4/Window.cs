@@ -16,7 +16,6 @@ namespace lw4
         private Figure _figure = new Figure(1f);
         private const float FIELD_OF_VIEW = 60 * MathF.PI / 180.0f;
         // Размер стороны куба
-        private const float CUBE_SIZE = 1;
 
         private const float Z_NEAR = 0.1f;
         private const float Z_FAR = 10;
@@ -120,25 +119,17 @@ namespace lw4
             {
                 float xAngle = e.DeltaY * MathF.PI / Size.Y;
                 float yAngle = e.DeltaX * MathF.PI / Size.X;
-                RotateCamera(xAngle, yAngle);
+                RotateObject(xAngle, yAngle);
             }
         }
 
-        private void RotateCamera(float xAngle, float yAngle)
+        private void RotateObject(float xAngle, float yAngle)
         {
             Vector3 xAxis = new(_cameraMatrix.M11, _cameraMatrix.M21, _cameraMatrix.M31);
             Vector3 yAxis = new(_cameraMatrix.M12, _cameraMatrix.M22, _cameraMatrix.M32);
 
-            //_cameraMatrix *= Matrix4.CreateFromAxisAngle(xAxis, xAngle);
-            //_cameraMatrix *= Matrix4.CreateFromAxisAngle(yAxis, yAngle);
-            //GL.PushMatrix();
-            //GL.LoadIdentity();
-            //GL.LoadMatrix(ref _cameraMatrix);
-            //GL.Rotate(xAngle, xAxis);
-            //GL.PopMatrix();
             _figure.Rotate(xAngle, xAxis);
             _figure.Rotate(yAngle, yAxis);
-            //_cameraMatrix = Orthonormalize(_cameraMatrix);
         }
 
         private void Draw()
