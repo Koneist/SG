@@ -74,11 +74,12 @@ namespace lw4
             _size = size;
 
             List<float> verteces = new();
+            List<float> normals = new();
             List<float> colors = new();
             foreach (var face in _faces)
             {
                 var startVertex = face[0];
-                Color4 color = new((float)_random.NextDouble(), 0, 0, 1);
+                Color4 color = new(1f, 0, 0, 1);
                 for (int i = 2; i < face.Length; ++i)
                 {
                     AddVertex(verteces, _verteces[startVertex]);
@@ -89,13 +90,20 @@ namespace lw4
                     var v1 = _verteces[face[i]] - _verteces[startVertex];
                     var normal = Vector3.Cross(v0, v1).Normalized();
 
+                    AddVertex(normals, normal);
+                    AddVertex(normals, normal);
+                    AddVertex(normals, normal);
+
                     AddColor(colors, color);
                     AddColor(colors, color);
                     AddColor(colors, color);
+
+
                 }
             }
 
             _vertexBuffer = verteces.ToArray();
+            _normalBuffer = normals.ToArray();
             _colorBuffer = colors.ToArray();
         }
 
@@ -121,10 +129,14 @@ namespace lw4
             GL.EnableClientState(ArrayCap.ColorArray);
             GL.ColorPointer(4, ColorPointerType.Float, 0, _colorBuffer);
 
+            GL.EnableClientState(ArrayCap.NormalArray);
+            GL.NormalPointer(NormalPointerType.Float, 0, _normalBuffer);
+
             GL.DrawArrays(PrimitiveType.Triangles, 0, _vertexBuffer.Length / 3);
+
             GL.DisableClientState(ArrayCap.VertexArray);
             GL.DisableClientState(ArrayCap.ColorArray);
-
+            GL.DisableClientState(ArrayCap.NormalArray);
 
             GL.PopMatrix();
         }

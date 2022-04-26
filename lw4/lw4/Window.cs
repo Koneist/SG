@@ -38,11 +38,20 @@ namespace lw4
 
         protected override void OnLoad()
         {
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light2);
             GL.ClearColor(Color4.White);
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Ccw);
             GL.Enable(EnableCap.DepthTest);
+
+            DirectLight light = new(new(0, 0, 0));
+            light.SetDiffuseIntensity(new(0.5f, 0.5f, 0.5f, 1f));
+            light.SetAmbientIntensity(new(0.3f, 0.3f, 0.3f, 1.0f));
+            light.SetSpecularIntensity(new(1.0f, 1.0f, 1.0f, 1.0f));
+            light.Apply(LightName.Light2);
+
             base.OnLoad();
         }
 
