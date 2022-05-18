@@ -29,7 +29,7 @@ namespace lw5.Object
 
         public void Animate(float timeDelta)
         {
-            _rotationAngle = _rotationAngle + _rotationSpeed * timeDelta % 360;
+            _rotationAngle = (_rotationAngle + _rotationSpeed * timeDelta) % 360;
         }
 
         public void SetInclinationAngle(float inclinationAngle)
@@ -52,8 +52,10 @@ namespace lw5.Object
             GL.Enable(EnableCap.Texture2D);
             texture.Use(TextureUnit.Texture0);
 
-            GL.Rotate(_inclinationAngle, 0, 0, 1);
-            GL.Rotate(_rotationAngle, 1, 0, 0);
+            GL.PushMatrix();
+
+            GL.Rotate(_inclinationAngle, 1, 0, 0);
+            GL.Rotate(_rotationAngle, 0, 0, 1);
             _sphere.Draw();
             GL.PopMatrix();
         }

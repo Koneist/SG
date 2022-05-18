@@ -15,16 +15,14 @@ namespace lw5
     internal class Window : GameWindow
     {
         //private Figure _figure = new Figure(1f);
-        private Planet _planet = new(@"E:\Projects\repository\SG\lw5\lw5\Texture\2k_earth_daymap.jpg");
-        private const float FIELD_OF_VIEW = 60 * MathF.PI / 180.0f;
+        private Planet _planet = new(@"D:\Projects\SG\lw5\lw5\Texture\2k_earth_daymap.jpg");
         // Размер стороны куба
 
         private const float Z_NEAR = 0.1f;
         private const float Z_FAR = 10;
-        private Matrix4 _cameraMatrix = Matrix4.LookAt(new(0, 0, 2),
-                                                       new(0, 0, 0),
-                                                       new(0, 2, 0));
         private bool _leftMouseBtnPressed = false;
+
+        private Camera _camera;
 
         public static Window StartWindow(NativeWindowSettings nativeWindowSettings)
         {
@@ -39,55 +37,102 @@ namespace lw5
 
         protected override void OnLoad()
         {
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Light2);
+            //GL.Enable(EnableCap.Lighting);
+            //GL.Enable(EnableCap.Light2);
             GL.ClearColor(Color4.White);
             GL.Enable(EnableCap.CullFace);
-            GL.CullFace(CullFaceMode.Back);
+            GL.CullFace(CullFaceMode.Front);
             GL.FrontFace(FrontFaceDirection.Ccw);
-            GL.Enable(EnableCap.DepthTest);
+            //GL.Enable(EnableCap.DepthTest);
+            
 
-            DirectLight light = new(new(0, 0, 0));
-            light.SetDiffuseIntensity(new(0.5f, 0.5f, 0.5f, 1f));
-            light.SetAmbientIntensity(new(0.3f, 0.3f, 0.3f, 1.0f));
-            light.SetSpecularIntensity(new(1.0f, 1.0f, 1.0f, 1.0f));
-            light.Apply(LightName.Light2);
+            //_planet.SetInclinationAngle();
+            //_planet.SetRotationSpeed(10);
+            _planet.SetInclinationAngle(90);
+            //DirectLight light = new(new(0, 0, 0));
+            //light.SetDiffuseIntensity(new(0.5f, 0.5f, 0.5f, 1f));
+            //light.SetAmbientIntensity(new(0.3f, 0.3f, 0.3f, 1.0f));
+            //light.SetSpecularIntensity(new(1.0f, 1.0f, 1.0f, 1.0f));
+            //light.Apply(LightName.Light2);
 
+
+            _camera = new Camera(Vector3.UnitZ * 2, (float)Size.X / (float)Size.Y);
             base.OnLoad();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            if (!IsFocused)
+                return;
+            
+            var input = KeyboardState;
+
+
+
+            const float cameraSpeed = 1.5f;
+            const float sensitivity = 0.2f;
+
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
                 Close();
             }
-            _planet.Animate((float)e.Time);
-            
+            if (input.IsKeyDown(Keys.W))
+            {
+                _camera.Position += _camera.Front * cameraSpeed * (float)e.Time; // Forward
+            }
+
+            if (input.IsKeyDown(Keys.S))
+            {
+                _camera.Position -= _camera.Front * cameraSpeed * (float)e.Time; // Backwards
+            }
+            if (input.IsKeyDown(Keys.A))
+            {
+                _camera.Position -= _camera.Right * cameraSpeed * (float)e.Time; // Left
+            }
+            if (input.IsKeyDown(Keys.D))
+            {
+                _camera.Position += _camera.Right * cameraSpeed * (float)e.Time; // Right
+            }
+            if (input.IsKeyDown(Keys.Space))
+            {
+                _camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
+            }
+            if (input.IsKeyDown(Keys.LeftShift))
+            {
+                _camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
+            }
+
             base.OnUpdateFrame(e);
         }
 
         protected override void OnResize(ResizeEventArgs e)
         {
-            GL.Viewport(0, 0, e.Width, e.Height);
-            float aspect = (float)e.Width / (float)e.Height;
-            
+            GL.Viewport(0, 0, Size.X, Size.Y);
+            _camera.AspectRatio = (float)Size.X / (float)Size.Y;
+
             GL.MatrixMode(MatrixMode.Projection);
-            var proj = Matrix4.CreatePerspectiveFieldOfView(FIELD_OF_VIEW, aspect, Z_NEAR, Z_FAR);
+            var proj = _camera.GetProjectionMatrix();
 
             GL.LoadMatrix(ref proj);
             GL.MatrixMode(MatrixMode.Modelview);
 
-
             base.OnResize(e);
         }
-
+        //float time = 0;
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
             Draw();
 
             SwapBuffers();
+            _planet.Animate((float)args.Time);
+
+            //if(time > 0.5f)
+            //{
+            //_camera.Yaw = (float)args.Time;
+
+            //}
+            //    time += (float)args.Time;
             base.OnRenderFrame(args);
         }
         protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -117,21 +162,12 @@ namespace lw5
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
             base.OnMouseMove(e);
+            const float sensitivity = 0.2f;
             if (_leftMouseBtnPressed)
             {
-                float xAngle = e.DeltaY * MathF.PI / Size.Y;
-                float yAngle = e.DeltaX * MathF.PI / Size.X;
-                RotateObject(xAngle, yAngle);
+                _camera.Yaw += e.DeltaX * sensitivity;
+                _camera.Pitch += e.DeltaY * sensitivity;
             }
-        }
-
-        private void RotateObject(float xAngle, float yAngle)
-        {
-            Vector3 xAxis = new(_cameraMatrix.M11, _cameraMatrix.M21, _cameraMatrix.M31);
-            Vector3 yAxis = new(_cameraMatrix.M12, _cameraMatrix.M22, _cameraMatrix.M32);
-
-            //.Rotate(xAngle, xAxis);
-            //_figure.Rotate(yAngle, yAxis);
         }
 
         private void Draw()
@@ -139,7 +175,8 @@ namespace lw5
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref _cameraMatrix);
+            var viewMatrix = _camera.GetViewMatrix();
+            GL.LoadMatrix(ref viewMatrix);
 
             _planet.Draw();
             //_figure.Draw();

@@ -98,11 +98,11 @@ namespace lw5.Object
 					vertexBuffer.Add(z1);
 
 				}
-
-				_vertexBuffer = vertexBuffer.ToArray();
-				_normalBuffer = normalbuffer.ToArray();
-				_texCoordBuffer = texCoordBuffer.ToArray();
 			}
+
+			_vertexBuffer = vertexBuffer.ToArray();
+			_normalBuffer = normalbuffer.ToArray();
+			_texCoordBuffer = texCoordBuffer.ToArray();
 		}
 		private void AddVertex(List<float> buffer, Vector3 vertex)
 		{
