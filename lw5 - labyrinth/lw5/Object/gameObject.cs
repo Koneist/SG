@@ -7,25 +7,32 @@ using System.Threading.Tasks;
 
 namespace lw5.Object
 {
-    internal class gameObject
+    internal class GameObject
     {
         private Vector3 _position;
-        private BoxCollider _boxCollider;
         private bool _isColliding;
 
-        public gameObject(Vector3 position, float length, float width, float height, bool isColliding = true)
+        public BoxCollider BoxCollider;
+
+        public GameObject(Vector3 position, float length, float width, float height, bool isColliding = true)
         {
             _position = position;
             _isColliding = isColliding;
 
-            
-            _boxCollider = new BoxCollider();
+
+            BoxCollider = new BoxCollider();
         }
 
         public Vector3 Position
         {
             get => _position;
             set => _position = value;
+        }
+
+        public bool IsColliding
+        {
+            get => _isColliding;
+            set => _isColliding = value;
         }
 
         public void Move(Vector3 moveVector) => _position += moveVector;

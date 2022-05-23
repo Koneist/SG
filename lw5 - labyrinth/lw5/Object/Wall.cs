@@ -8,7 +8,7 @@ using OpenTK.Mathematics;
 
 namespace lw5.Object
 {
-    internal class Wall : gameObject
+    internal class Wall : GameObject
     {
         private float _width;
         private float _length;

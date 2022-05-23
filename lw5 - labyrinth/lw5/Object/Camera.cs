@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace lw5.Object
 {
-    internal class Camera : gameObject
+    internal class Camera : GameObject
     {
         // Those vectors are directions pointing outwards from the camera to define how it rotated.
         private Vector3 _front = -Vector3.UnitZ;
@@ -30,7 +30,7 @@ namespace lw5.Object
         private float _sensitivity = 0.2f;
 
         public Camera(Vector3 position, float aspectRatio)
-            :base(position)
+            :base(position, 0.2f, 0.2f, 0.2f)
         {
             //Position = position;
             AspectRatio = aspectRatio;
