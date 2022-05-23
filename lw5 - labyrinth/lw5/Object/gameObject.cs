@@ -10,10 +10,16 @@ namespace lw5.Object
     internal class gameObject
     {
         private Vector3 _position;
+        private BoxCollider _boxCollider;
+        private bool _isColliding;
 
-        public gameObject(Vector3 position)
+        public gameObject(Vector3 position, float length, float width, float height, bool isColliding = true)
         {
             _position = position;
+            _isColliding = isColliding;
+
+            
+            _boxCollider = new BoxCollider();
         }
 
         public Vector3 Position
@@ -22,9 +28,9 @@ namespace lw5.Object
             set => _position = value;
         }
 
-        public void Move(Vector3 moveVector)
-        {
+        public void Move(Vector3 moveVector) => _position += moveVector;
 
-        }
+        
+        
     }
 }

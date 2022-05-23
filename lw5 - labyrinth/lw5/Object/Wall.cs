@@ -19,34 +19,6 @@ namespace lw5.Object
 
         private float[] _vertexBuffer;
 
-        private float[] _texCoordBuffer = 
-        {
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-
-        };
 
         /*
 
@@ -81,19 +53,51 @@ namespace lw5.Object
             new(-1, +1, +1),          // 7
         };
 
-
         private List<int[]> _faces = new()
         {
             new[] { 4, 7, 3, 0 },
-            new[] { 5, 1, 2, 6 },
+            new[] { 1, 2, 6, 5 },
             new[] { 4, 0, 1, 5 },
-            new[] { 7, 6, 2, 3 },
+            new[] { 6, 2, 3, 7 },
             new[] { 0, 3, 2, 1 },
-            new[] { 4, 5, 6, 7 },
+            new[] { 5, 6, 7, 4 },
+        };
+        
+        private float[] _texCoordBuffer = 
+        {
+            0, 0,
+            0, 1,
+            1, 1,
+            1, 0,
+
+            0, 0,
+            0, 1,
+            1, 1,
+            1, 0,
+
+            0, 0,
+            0, 1,
+            1, 1,
+            1, 0,
+
+            0, 0,
+            0, 1,
+            1, 1,
+            1, 0,
+
+            0, 0,
+            0, 1,
+            1, 1,
+            1, 0,
+
+            0, 0,
+            0, 1,
+            1, 1,
+            1, 0,
         };
 
         public Wall(Vector3 pos, float width, float length, float height, string textureName)
-            : base(pos)
+            : base(pos, length, width, height)
         {
             _width = width;
             _length = length;
@@ -108,18 +112,35 @@ namespace lw5.Object
         {
             List<float> vertexBuffer = new();
 
-            foreach(var face in _faces)
+            for(int faceIndex = 0; faceIndex < _faces.Count; ++faceIndex)
             {
-                foreach(var vertex in face)
+                foreach(var vertex in _faces[faceIndex])
                 {
                     var vec = _baseVerteces[vertex];
                     vertexBuffer.Add(vec.X * _length * 0.5f);
                     vertexBuffer.Add(vec.Y * _width * 0.5f);
                     vertexBuffer.Add(vec.Z * _height * 0.5f);
                 }
+
+                if(faceIndex < 2)
+                    SetTexCoord(faceIndex, _height, _width);
+                else if (faceIndex == 2 || faceIndex == 3)
+                    SetTexCoord(faceIndex, _length, _width);
+                else if(faceIndex > 2)
+                    SetTexCoord(faceIndex, _length, _height);
             }
 
             _vertexBuffer = vertexBuffer.ToArray();
+        }
+
+        private void SetTexCoord(int faceIndex, float x, float y)
+        {
+            for (int i = 0; i < 8; i += 2)
+            {
+                var texVertex = faceIndex * 8;
+                _texCoordBuffer[texVertex + i] *= x;
+                _texCoordBuffer[texVertex + i + 1] *= y;
+            }
         }
 
         public void Draw()

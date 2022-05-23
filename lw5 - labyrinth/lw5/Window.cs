@@ -79,28 +79,34 @@ namespace lw5
             }
             if (input.IsKeyDown(Keys.W))
             {
-                _camera.Position += _camera.Front * cameraSpeed * (float)e.Time; // Forward
+                _camera.MoveForward((float)e.Time);
+                //_camera.Position += _camera.Front * cameraSpeed * (float)e.Time; // Forward
             }
 
             if (input.IsKeyDown(Keys.S))
             {
-                _camera.Position -= _camera.Front * cameraSpeed * (float)e.Time; // Backwards
+                _camera.MoveBack((float)e.Time);
+                //_camera.Position -= _camera.Front * cameraSpeed * (float)e.Time; // Backwards
             }
             if (input.IsKeyDown(Keys.A))
             {
-                _camera.Position -= _camera.Right * cameraSpeed * (float)e.Time; // Left
+                _camera.MoveLeft((float)e.Time);
+                //_camera.Position -= _camera.Right * cameraSpeed * (float)e.Time; // Left
             }
             if (input.IsKeyDown(Keys.D))
             {
-                _camera.Position += _camera.Right * cameraSpeed * (float)e.Time; // Right
+                _camera.MoveRight((float)e.Time);
+                //.Position += _camera.Right * cameraSpeed * (float)e.Time; // Right
             }
             if (input.IsKeyDown(Keys.Space))
             {
-                _camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
+                _camera.MoveUp((float)e.Time);
+                //_camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
             }
             if (input.IsKeyDown(Keys.LeftShift))
             {
-                _camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
+                _camera.MoveDown((float)e.Time);
+                //_camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
             }
 
             base.OnUpdateFrame(e);
@@ -166,8 +172,9 @@ namespace lw5
             const float sensitivity = 0.2f;
             if (_leftMouseBtnPressed)
             {
-                _camera.Yaw += e.DeltaX * sensitivity;
-                _camera.Pitch += e.DeltaY * sensitivity;
+                //_camera.Yaw += e.DeltaX * sensitivity;
+                //_camera.Pitch += e.DeltaY * sensitivity;
+                _camera.Rotate(e.DeltaX, e.DeltaY);
             }
         }
 

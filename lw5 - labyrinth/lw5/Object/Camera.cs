@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace lw5
+namespace lw5.Object
 {
-    internal class Camera
+    internal class Camera : gameObject
     {
         // Those vectors are directions pointing outwards from the camera to define how it rotated.
         private Vector3 _front = -Vector3.UnitZ;
@@ -25,14 +25,19 @@ namespace lw5
         // The field of view of the camera (radians)
         private float _fov = MathHelper.PiOver2;
 
+        private float _speed = 1.5f;
+
+        private float _sensitivity = 0.2f;
+
         public Camera(Vector3 position, float aspectRatio)
+            :base(position)
         {
-            Position = position;
+            //Position = position;
             AspectRatio = aspectRatio;
         }
 
         // The position of the camera
-        public Vector3 Position { get; set; }
+        //public Vector3 Position { get; set; }
 
         // This is simply the aspect ratio of the viewport, used for the projection matrix.
         public float AspectRatio { private get; set; }
@@ -111,6 +116,50 @@ namespace lw5
             // not be what you need for all cameras so keep this in mind if you do not want a FPS camera.
             _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
             _up = Vector3.Normalize(Vector3.Cross(_right, _front));
+        }
+
+        public void MoveForward(float frameTime)
+        {
+            var front = Front;
+            front.Y = 0;
+            Move(front * _speed * frameTime);
+            //Position += front * _speed * frameTime;
+        }
+
+        public void MoveBack(float frameTime)
+        {
+            var front = Front;
+            front.Y = 0;
+            Move(front * -_speed * frameTime);
+            //Position -= front * _speed * frameTime;
+        }
+
+        public void MoveLeft(float frameTime)
+        {
+            Move(Right * -_speed * frameTime);
+            //Position -= Right * _speed * frameTime;
+        }
+
+        public void MoveRight(float frameTime)
+        {
+            Move(Right * _speed * frameTime);
+            //Position += Right * _speed * frameTime;
+        }
+        public void MoveUp(float frameTime)
+        {
+            Move(Up * _speed * frameTime);
+            //Position += Up * _speed * frameTime;
+        }
+        public void MoveDown(float frameTime)
+        {
+            Move(Up * -_speed * frameTime);
+            //Position -= Up * _speed * frameTime;
+        }
+
+        public void Rotate(float deltaX, float deltaY)
+        {
+            Yaw += deltaX * _sensitivity;
+            Pitch += deltaY * _sensitivity;
         }
     }
 }
