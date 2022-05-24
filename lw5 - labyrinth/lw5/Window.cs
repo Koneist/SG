@@ -9,20 +9,22 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 using lw5.Object;
+using System.IO;
 
 namespace lw5
 {
     internal class Window : GameWindow
     {
-        private Figure _figure = new Figure(1f);
-        private Planet _planet = new(@"E:\Projects\repository\SG\lw5 - labyrinth\lw5\Texture\2k_earth_daymap.jpg");
-        private Wall _wall = new(new(1, 1, 0), 1, 0.2f, 1, @"E:\Projects\repository\SG\lw5 - labyrinth\lw5\Texture\pexels-pixabay-220182.jpg");
-        private Wall _wall1 = new(new(-1, 1, 0), 1, 0.2f, 1, @"E:\Projects\repository\SG\lw5 - labyrinth\lw5\Texture\pexels-pixabay-220182.jpg");
+        private Wall _wall;
+        private Wall _wall1;
+        private Wall[] walls;
+        Random random = new Random();
         // Размер стороны куба
 
         private const float Z_NEAR = 0.1f;
         private const float Z_FAR = 10;
         private bool _leftMouseBtnPressed = false;
+        private Texture[] _textures;
 
         private Camera _camera;
 
@@ -36,29 +38,78 @@ namespace lw5
             : base(gameWindowSettings, nativeWindowSettings)
         {
         }
-
         protected override void OnLoad()
         {
-            //GL.Enable(EnableCap.Lighting);
-            //GL.Enable(EnableCap.Light2);
             GL.ClearColor(Color4.White);
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Ccw);
             GL.Enable(EnableCap.DepthTest);
-            
 
-            //_planet.SetInclinationAngle();
-            //_planet.SetRotationSpeed(10);
-            _planet.SetInclinationAngle(90);
-            //DirectLight light = new(new(0, 0, 0));
-            //light.SetDiffuseIntensity(new(0.5f, 0.5f, 0.5f, 1f));
-            //light.SetAmbientIntensity(new(0.3f, 0.3f, 0.3f, 1.0f));
-            //light.SetSpecularIntensity(new(1.0f, 1.0f, 1.0f, 1.0f));
-            //light.Apply(LightName.Light2);
+            var startPos = new Vector3(0, 0.5f, 0);
+            _camera = new Camera(startPos, (float)Size.X / (float)Size.Y);
+
+            var directory = Environment.CurrentDirectory;
+            directory = Directory.GetParent(directory).Parent.Parent.FullName;
+            directory += @"\Texture";
+            var files = Directory.GetFiles(directory);
+            _textures = new Texture[files.Length];
+            for(int i = 0; i < files.Length; ++i)
+            {
+                _textures[i] = Texture.LoadFromFile(files[i]);
+            }
+
+            walls = new Wall[]
+            {
+                new(Vector3.Zero, 10, 10, 0.1f, _textures[0]),
+                new(new(0, 0.55f, 4.9f), 0.2f, 9.6f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(4.9f, 0.55f, 0), 9.6f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(0, 0.55f, -4.9f), 0.2f, 9.6f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-4.9f, 0.55f, 0), 9.6f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+
+                new(new(1.3f, 0.55f, 0.9f), 0.2f, 1.9f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-0.6f, 0.55f, 0.9f), 0.2f, 0.5f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+
+                new(new(0.6f, 0.55f, -0.9f), 0.2f, 0.5f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-0.575f, 0.55f, -0.9f), 0.2f, 0.45f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+
+                new(new(0.9f, 0.55f, 0.6f), 0.5f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(0.9f, 0.55f, -1.35f), 2f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+
+                new(new(-0.9f, 0.55f, 2.2f), 3.7f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-0.9f, 0.55f, -0.675f), 0.65f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+
+                new(new(-2.5f, 0.55f, 0.45f), 0.2f, 3f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-2.5f, 0.55f, -0.45f), 0.2f, 3f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+
+                new(new(-3.9f, 0.55f, 2.3f), 3.5f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-2f, 0.55f, 3.95f), 0.2f, 2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-2.9f, 0.55f, 2.6f), 2.5f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-2.3f, 0.55f, 1.45f), 0.2f, 1.0f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(0.3f, 0.55f, 1.8f), 0.2f, 2.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(2.35f, 0.55f, 1.35f), 1.1f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(0.2f, 0.55f, 3.4f), 1.3f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(1.3f, 0.55f, 4.3f), 1f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(1.4f, 0.55f, 2.85f), 0.2f, 2.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(2.4f, 0.55f, 3.9f), 0.2f, 2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(3.3f, 0.55f, 3.3f), 1f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(4f, 0.55f, 1.75f), 0.2f, 1.6f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(3.3f, 0.55f, 0.7f), 1.9f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(2.5f, 0.55f, -0.15f), 0.2f, 1.4f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(2.75f, 0.55f, -1.15f), 0.2f, 1.9f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(3.6f, 0.55f, -2.0f), 1.5f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(3.4f, 0.55f, -3.75f), 0.2f, 2.8f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(1.9f, 0.55f, -2.55f), 2.6f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-0.4f, 0.55f, -2.45f), 0.2f, 2.8f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-1.9f, 0.55f, -1.95f), 1.2f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-0.5f, 0.55f, -3.75f), 0.2f, 3f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-0.5f, 0.55f, -4.325f), 0.95f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-3f, 0.55f, -3.075f), 3.45f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-3.9f, 0.55f, -2.3f), 3.5f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+                new(new(-1.9f, 0.55f, 2.3f), 1.55f, 0.2f, 1, _textures[random.Next(1, _textures.Length - 1)]),
+            };
 
 
-            _camera = new Camera(Vector3.UnitZ * 2, (float)Size.X / (float)Size.Y);
             base.OnLoad();
         }
 
@@ -69,11 +120,6 @@ namespace lw5
             
             var input = KeyboardState;
 
-
-
-            const float cameraSpeed = 1.5f;
-            const float sensitivity = 0.2f;
-
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
                 Close();
@@ -81,34 +127,19 @@ namespace lw5
             if (input.IsKeyDown(Keys.W))
             {
                 _camera.MoveForward((float)e.Time);
-                //_camera.Position += _camera.Front * cameraSpeed * (float)e.Time; // Forward
+
             }
 
             if (input.IsKeyDown(Keys.S))
-            {
                 _camera.MoveBack((float)e.Time);
-                //_camera.Position -= _camera.Front * cameraSpeed * (float)e.Time; // Backwards
-            }
             if (input.IsKeyDown(Keys.A))
-            {
                 _camera.MoveLeft((float)e.Time);
-                //_camera.Position -= _camera.Right * cameraSpeed * (float)e.Time; // Left
-            }
             if (input.IsKeyDown(Keys.D))
-            {
                 _camera.MoveRight((float)e.Time);
-                //.Position += _camera.Right * cameraSpeed * (float)e.Time; // Right
-            }
-            if (input.IsKeyDown(Keys.Space))
-            {
-                _camera.MoveUp((float)e.Time);
-                //_camera.Position += _camera.Up * cameraSpeed * (float)e.Time; // Up
-            }
-            if (input.IsKeyDown(Keys.LeftShift))
-            {
-                _camera.MoveDown((float)e.Time);
-                //_camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
-            }
+            //if (input.IsKeyDown(Keys.Space))
+            //    _camera.MoveUp((float)e.Time);
+            //if (input.IsKeyDown(Keys.LeftShift))
+            //    _camera.MoveDown((float)e.Time);
 
             base.OnUpdateFrame(e);
         }
@@ -126,21 +157,13 @@ namespace lw5
 
             base.OnResize(e);
         }
-        //float time = 0;
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
             Draw();
 
             SwapBuffers();
-            _planet.Animate((float)args.Time);
 
-            //if(time > 0.5f)
-            //{
-            //_camera.Yaw = (float)args.Time;
-
-            //}
-            //    time += (float)args.Time;
             base.OnRenderFrame(args);
         }
         protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -170,11 +193,9 @@ namespace lw5
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
             base.OnMouseMove(e);
-            const float sensitivity = 0.2f;
+
             if (_leftMouseBtnPressed)
             {
-                //_camera.Yaw += e.DeltaX * sensitivity;
-                //_camera.Pitch += e.DeltaY * sensitivity;
                 _camera.Rotate(e.DeltaX, e.DeltaY);
             }
         }
@@ -187,10 +208,8 @@ namespace lw5
             var viewMatrix = _camera.GetViewMatrix();
             GL.LoadMatrix(ref viewMatrix);
 
-            //_planet.Draw();
-            _wall1.Draw();
-            _wall.Draw();
-            //_figure.Draw();
+            foreach(var wall in walls)
+                wall.Draw();
         }
     }
 }

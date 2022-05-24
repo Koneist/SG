@@ -13,9 +13,7 @@ namespace lw5.Object
         private float _width;
         private float _length;
         private float _height;
-        private string _textureName;
         private Texture _texture;
-        private bool _isLoad = false;
 
         private float[] _vertexBuffer;
 
@@ -65,45 +63,44 @@ namespace lw5.Object
         
         private float[] _texCoordBuffer = 
         {
-            0, 0,
-            0, 1,
-            1, 1,
             1, 0,
+            1, 1,
+            0, 1,
+            0, 0,
 
-            0, 0,
-            0, 1,
-            1, 1,
             1, 0,
+            1, 1,
+            0, 1,
+            0, 0,
 
-            0, 0,
-            0, 1,
-            1, 1,
             1, 0,
+            1, 1,
+            0, 1,
+            0, 0,
 
-            0, 0,
-            0, 1,
-            1, 1,
             1, 0,
+            1, 1,
+            0, 1,
+            0, 0,
 
-            0, 0,
-            0, 1,
-            1, 1,
             1, 0,
+            1, 1,
+            0, 1,
+            0, 0,
 
-            0, 0,
-            0, 1,
-            1, 1,
             1, 0,
+            1, 1,
+            0, 1,
+            0, 0,
         };
 
-        public Wall(Vector3 pos, float width, float length, float height, string textureName)
-            : base(pos, length, width, height)
+        public Wall(Vector3 pos, float width, float length, float height, Texture texture)
+        : base(pos, length, width, height)
         {
             _width = width;
             _length = length;
             _height = height;
-            _textureName = textureName;
-            //_texture = Texture.LoadFromFile(_textureName);
+            _texture = texture;
 
             SetBuffer();
         }
@@ -118,12 +115,12 @@ namespace lw5.Object
                 {
                     var vec = _baseVerteces[vertex];
                     vertexBuffer.Add(vec.X * _length * 0.5f);
-                    vertexBuffer.Add(vec.Y * _width * 0.5f);
-                    vertexBuffer.Add(vec.Z * _height * 0.5f);
+                    vertexBuffer.Add(vec.Y * _height * 0.5f);
+                    vertexBuffer.Add(vec.Z * _width * 0.5f);
                 }
 
                 if(faceIndex < 2)
-                    SetTexCoord(faceIndex, _height, _width);
+                    SetTexCoord(faceIndex, _width, _height);
                 else if (faceIndex == 2 || faceIndex == 3)
                     SetTexCoord(faceIndex, _length, _width);
                 else if(faceIndex > 2)
@@ -145,11 +142,6 @@ namespace lw5.Object
 
         public void Draw()
         {
-            if (!_isLoad)
-            {
-                _texture = Texture.LoadFromFile(_textureName);
-                _isLoad = true;
-            }
 
             GL.PushMatrix();
 
@@ -161,8 +153,6 @@ namespace lw5.Object
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.VertexPointer(3, VertexPointerType.Float, 0, _vertexBuffer);
 
-            //GL.EnableClientState(ArrayCap.NormalArray);
-            //GL.NormalPointer(NormalPointerType.Float, 0, _normalBuffer);
 
             GL.EnableClientState(ArrayCap.TextureCoordArray);
             GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, _texCoordBuffer);
@@ -172,7 +162,6 @@ namespace lw5.Object
             GL.DisableClientState(ArrayCap.TextureCoordArray);
 
             GL.PopMatrix();
-            //GL.DisableClientState(ArrayCap.NormalArray);
         }
     }
 }

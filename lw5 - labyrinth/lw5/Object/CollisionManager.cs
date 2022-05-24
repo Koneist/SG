@@ -30,16 +30,10 @@ namespace lw5.Object
                 if (gameObject == collider)
                     continue;
 
-                if (!collider.BoxCollider.Contains(gameObject.BoxCollider))
+                if (collider.BoxCollider.Contains(gameObject.BoxCollider))
                 {
-                    continue;
-                }
-                else
-                {
-                    extruction = collider.BoxCollider.GetExtruction(gameObject.BoxCollider, moveVector);
-                    //var extruction = collider.BoxCollider.GetExtructionVec(moveVector);
+                    extruction += collider.BoxCollider.GetExtruction(gameObject.BoxCollider, moveVector);
                     
-                    //moveVector = moveVector - (moveVector * extruction);
                 }
 
             }

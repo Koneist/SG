@@ -15,14 +15,14 @@ namespace lw6.Object
         public Plane()
         {
             var verteces = new List<float>();
-            Vector3 startPos = new(-1, 0, -1);
+            Vector3 startPos = new(-10, 0, -10);
 
-            for(int i = 0; i < 10; ++i)
+            for(int i = 0; i < 100; ++i)
             {
                 var currPos = startPos;
                 currPos.X += 0.1f * i;
 
-                for(int j = 0; j < 10; ++j)
+                for(int j = 0; j < 100; ++j)
                 {
                     
                     verteces.Add(currPos.X);
