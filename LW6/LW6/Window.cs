@@ -100,13 +100,15 @@ namespace lw6
 
             base.OnResize(e);
         }
-        //float time = 0;
+
+        private float _time = 0;
+
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
-
+            _time += (float)args.Time;
             int timeLocation = GL.GetUniformLocation(_shader.Handle, "uTime");
-            GL.Uniform1(timeLocation, 1);
+            GL.Uniform1(timeLocation, _time);
 
             _shader.Use();
 

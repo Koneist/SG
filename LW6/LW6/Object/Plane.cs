@@ -15,14 +15,14 @@ namespace lw6.Object
         public Plane()
         {
             var verteces = new List<float>();
-            Vector3 startPos = new(-10, 0, -10);
+            Vector3 startPos = new(-1, 0, -1);
 
-            for(int i = 0; i < 100; ++i)
+            for(int i = 0; i < 20; ++i)
             {
                 var currPos = startPos;
                 currPos.X += 0.1f * i;
 
-                for(int j = 0; j < 100; ++j)
+                for(int j = 0; j < 20; ++j)
                 {
                     
                     verteces.Add(currPos.X);
@@ -53,7 +53,6 @@ namespace lw6.Object
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.VertexPointer(3, VertexPointerType.Float, 0, _vertexBuffer);
 
-            GL.Color4(Color4.Red);
             GL.DrawArrays(PrimitiveType.Quads, 0, _vertexBuffer.Length / 3);
 
             GL.DisableClientState(ArrayCap.VertexArray);
