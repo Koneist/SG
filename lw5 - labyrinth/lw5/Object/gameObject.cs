@@ -18,9 +18,9 @@ namespace lw5.Object
         {
             _position = position;
             _isColliding = isColliding;
+            CollisionManager.AddCollider(this);
 
-
-            BoxCollider = new BoxCollider();
+            BoxCollider = new BoxCollider(position, length, width, height);
         }
 
         public Vector3 Position
@@ -35,7 +35,17 @@ namespace lw5.Object
             set => _isColliding = value;
         }
 
-        public void Move(Vector3 moveVector) => _position += moveVector;
+        public void Move(Vector3 moveVector)
+        {
+            _position += moveVector;
+            BoxCollider.Translate(moveVector);
+            if (_isColliding)
+            {
+                var extruction = CollisionManager.GetExtruction(this, moveVector);
+                _position += extruction;
+                BoxCollider.Translate(extruction);
+            }
+        }
 
         
         

@@ -9,151 +9,89 @@ namespace lw5.Object
 {
     internal struct BoxCollider
     {
-        private Vector3 _frontRightTop;
-        private Vector3 _frontLeftTop;
-        private Vector3 _backLeftTop;
-        private Vector3 _backRightTop;
-        private Vector3 _frontRightBottom;
-        private Vector3 _frontLeftBottom;
-        private Vector3 _backLeftBottom;
-        private Vector3 _backRightBottom;
+        private Box3 box;
 
-        private Vector3 _position;
-
-        private static List<Vector3> _baseVerteces = new()
+        private static Vector3[] _compass =
         {
-            new(-1, -1, -1),          // 0
-            new(+1, -1, -1),          // 1
-            new(+1, +1, -1),          // 2
-            new(-1, +1, -1),          // 3
-            new(-1, -1, +1),          // 4
-            new(+1, -1, +1),          // 5
-            new(+1, +1, +1),          // 6
-            new(-1, +1, +1),          // 7
+            Vector3.UnitZ,
+            -Vector3.UnitZ,
+            Vector3.UnitX,
+            -Vector3.UnitX,
+            Vector3.UnitY,
+            -Vector3.UnitY
         };
 
         public BoxCollider(Vector3 position, float length, float width, float height)
         {
-            var collider = new List<Vector3>(_baseVerteces.Count);
-            foreach (var vertex in _baseVerteces)
+            var min = new Vector3(position.X - length * 0.5f, position.Y - height * 0.5f, position.Z - width * 0.5f);
+            var max = new Vector3(position.X + length * 0.5f, position.Y + height * 0.5f, position.Z + width * 0.5f);
+            box = new Box3(min, max);
+        }
+
+
+
+        public Vector3 FrontNormal => _compass[0];
+        public Vector3 BackNormal => _compass[1];
+        public Vector3 RightNormal => _compass[2];
+        public Vector3 LeftNormal => _compass[3];
+        public Vector3 UpNormal => _compass[4];
+        public Vector3 DownNormal => _compass[5];
+
+        public bool Contains(Box3 other) => box.Contains(other);
+        public bool Contains(BoxCollider other) => box.Contains(other.box);
+        public void Translate(Vector3 distance) => box.Translate(distance);
+
+        public Vector3 GetExtructionVec(Vector3 moveVector)
+        {
+            var result = Vector3.Zero;
+            var normMoveVector = moveVector.Normalized();
+
+            float max = 0.0f;
+            int bestMatch = 0;
+
+            for(int i = 0; i< _compass.Length; ++i)
             {
-                var vec = vertex;
-                vec.X *= length * 0.5f;
-                vec.Y *= width * 0.5f;
-                vec.Z *= height * 0.5f;
-                collider.Add(vec);
+                var dotProduct = Vector3.Dot(normMoveVector, _compass[i]);
+                if(dotProduct > max)
+                {
+                    max = dotProduct;
+                    bestMatch = i;
+                }
             }
-            _position = position;
-            _frontRightTop = Vector3.Zero;
-            _frontLeftTop = Vector3.Zero;
-            _backLeftTop = Vector3.Zero;
-            _backRightTop = Vector3.Zero;
-            _frontRightBottom = Vector3.Zero;
-            _frontLeftBottom = Vector3.Zero;
-            _backLeftBottom = Vector3.Zero;
-            _backRightBottom = Vector3.Zero;
-            SetNewCoord(out _frontRightTop, collider[0]);
-            SetNewCoord(out _frontLeftTop, collider[1]);
-            SetNewCoord(out _backLeftTop, collider[2]);
-            SetNewCoord(out _backRightTop, collider[3]);
-            SetNewCoord(out _frontRightBottom, collider[4]);
-            SetNewCoord(out _frontLeftBottom, collider[5]);
-            SetNewCoord(out _backLeftBottom, collider[6]);
-            SetNewCoord(out _backRightBottom, collider[7]);
+
+            return -_compass[bestMatch];
         }
 
-        public BoxCollider(Vector3 position,
-                           Vector3 frontRightTop,
-                           Vector3 frontLeftTop,
-                           Vector3 backLeftTop,
-                           Vector3 backRightTop,
-                           Vector3 frontRightBottom,
-                           Vector3 frontLeftBottom,
-                           Vector3 backLeftBottom,
-                           Vector3 backRightBottom)
+        public Vector3 GetExtruction(Box3 other, Vector3 moveVector)
         {
-            _position = position;
-            _frontRightTop = Vector3.Zero;
-            _frontLeftTop = Vector3.Zero;
-            _backLeftTop = Vector3.Zero;
-            _backRightTop = Vector3.Zero;
-            _frontRightBottom = Vector3.Zero;
-            _frontLeftBottom = Vector3.Zero;
-            _backLeftBottom = Vector3.Zero;
-            _backRightBottom = Vector3.Zero;
-            SetNewCoord(out _frontRightTop, frontRightTop);
-            SetNewCoord(out _frontLeftTop, frontLeftTop);
-            SetNewCoord(out _backLeftTop, backLeftTop);
-            SetNewCoord(out _backRightTop, backRightTop);
-            SetNewCoord(out _frontRightBottom, frontRightBottom);
-            SetNewCoord(out _frontLeftBottom, frontLeftBottom);
-            SetNewCoord(out _backLeftBottom, backLeftBottom);
-            SetNewCoord(out _backRightBottom, backRightBottom);
-            
-        }
+            var result = Vector3.Zero;
 
-        public Vector3 FrontRightTop 
-        {
-            get => _frontRightTop;
-            set => SetNewCoord(out _frontRightTop, value); 
-        }
-        public Vector3 FrontLeftTop 
-        { 
-            get => _frontLeftTop; 
-            set => SetNewCoord(out _frontLeftTop, value); 
-        }
-        public Vector3 BackLeftTop
-        {
-            get => _backLeftTop;
-            set => SetNewCoord(out _backLeftTop, value);
-        }
-        public Vector3 BackRightTop
-        {
-            get => _backRightTop;
-            set => SetNewCoord(out _backRightTop, value);
-        }
-        public Vector3 FrontRightBottom
-        {
-            get => _frontRightBottom;
-            set => SetNewCoord(out _frontRightBottom, value);
-        }
-        public Vector3 FrontLeftBottom
-        {
-            get => _frontLeftBottom;
-            set => SetNewCoord(out _frontLeftBottom, value);
-        }
-        public Vector3 BackLeftBottom
-        {
-            get => _backLeftBottom;
-            set => SetNewCoord(out _backLeftBottom, value);
-        }
-        public Vector3 BackRightBottom
-        {
-            get => _backRightBottom;
-            set => SetNewCoord(out _backRightBottom, value);
-        }
+            var minX = MathF.Max(box.Min.X, other.Min.X);
+            var minY = MathF.Max(box.Min.Y, other.Min.Y);
+            var minZ = MathF.Max(box.Min.Z, other.Min.Z);
 
-        public Vector3 Postition
-        {
-            get => _position;
-            set 
-            {
-                _position = value;
-                SetNewCoord(out _frontRightTop, _frontRightTop);
-                SetNewCoord(out _frontLeftTop, _frontLeftTop);
-                SetNewCoord(out _backLeftTop, _backLeftTop);
-                SetNewCoord(out _backRightTop, _backRightTop);
-                SetNewCoord(out _frontRightBottom, _frontRightBottom);
-                SetNewCoord(out _frontLeftBottom, _frontLeftBottom);
-                SetNewCoord(out _backLeftBottom, _backLeftBottom);
-                SetNewCoord(out _backRightBottom, _backRightBottom);
-            }
-        }
+            var maxX = MathF.Min(box.Max.X, other.Max.X);
+            var maxY = MathF.Min(box.Max.Y, other.Max.Y);
+            var maxZ = MathF.Min(box.Max.Z, other.Max.Z);
 
-        private void SetNewCoord(out Vector3 outCoord, Vector3 coord)
-        {
-            outCoord = new(new Vector4(coord) * Matrix4.CreateTranslation(_position));
+            var distance = new Vector3( maxX - minX, maxY - minY, maxZ - minZ);
+            var min = distance.X > distance.Y ? distance.Y : distance.X;
+            min = min > distance.Z ? distance.Z : min;
+
+            if (distance.X == min) result.X = min;
+            if (distance.Y == min) result.Y = min;
+            if (distance.Z == min) result.Z = min;
+
+            var direction = Vector3.One;
+            moveVector.Normalize();
+
+            if (box.Center.X > other.Center.X) direction.X *= -1;
+            if (box.Center.Y > other.Center.Y) direction.Y *= -1;
+            if (box.Center.Z > other.Center.Z) direction.Z *= -1;
+
+            return result * direction;
         }
+        public Vector3 GetExtruction(BoxCollider other, Vector3 moveVector) => GetExtruction(other.box, moveVector);
 
     }
 }

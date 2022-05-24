@@ -17,6 +17,7 @@ namespace lw5
         private Figure _figure = new Figure(1f);
         private Planet _planet = new(@"E:\Projects\repository\SG\lw5 - labyrinth\lw5\Texture\2k_earth_daymap.jpg");
         private Wall _wall = new(new(1, 1, 0), 1, 0.2f, 1, @"E:\Projects\repository\SG\lw5 - labyrinth\lw5\Texture\pexels-pixabay-220182.jpg");
+        private Wall _wall1 = new(new(-1, 1, 0), 1, 0.2f, 1, @"E:\Projects\repository\SG\lw5 - labyrinth\lw5\Texture\pexels-pixabay-220182.jpg");
         // Размер стороны куба
 
         private const float Z_NEAR = 0.1f;
@@ -44,7 +45,7 @@ namespace lw5
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Ccw);
-            //GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.DepthTest);
             
 
             //_planet.SetInclinationAngle();
@@ -187,6 +188,7 @@ namespace lw5
             GL.LoadMatrix(ref viewMatrix);
 
             //_planet.Draw();
+            _wall1.Draw();
             _wall.Draw();
             //_figure.Draw();
         }
