@@ -70,7 +70,7 @@ private:
 	CCheckerShader & CreateCheckerShader(CMatrix4d const& textureTransform);
 
 	// Методы, создающие и добавляющие объекты к сцене
-	CSceneObject& AddTorus(IShader const& shader, double radius, CVector3d const& center, CMatrix4d const& transform);
+	CSceneObject& AddTorus(IShader const& shader, double radius, double smallRadius, CVector3d const& center, CMatrix4d const& transform);
 	CSceneObject & AddSphere(IShader const& shader, double radius = 1, CVector3d const& center = CVector3d(), CMatrix4d const& transform = CMatrix4d());
 	CSceneObject & AddConicCylinder(IShader const& shader, double height = 1, double baseRadius = 1, double capRadius = 0, CMatrix4d const& transform = CMatrix4d());
 	CSceneObject & AddPlane(IShader const& shader, double a, double b, double c, double d, CMatrix4d const& transform = CMatrix4d());

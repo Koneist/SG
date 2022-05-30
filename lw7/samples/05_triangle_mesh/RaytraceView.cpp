@@ -31,13 +31,13 @@ CRaytraceView::CRaytraceView()
 	AddSomePlane();
 	AddSomeTorus();
 
-	AddSomeSpheres();
+	//AddSomeSpheres();
 
 	AddSomeConicCylinders();
 
 	AddSomeLight();
 
-	AddSomeTetrahedron();
+	//AddSomeTetrahedron();
 
 	/*
 	Задаем параметры видового порта и матрицы проецирования в контексте визуализации
@@ -61,8 +61,11 @@ void CRaytraceView::AddSomeTorus()
 	CSimpleMaterial yellow;
 	yellow.SetDiffuseColor(CVector4f(1, 1, 0, 1));
 	CSimpleDiffuseShader& shader = CreateSimpleDiffuseShader(yellow);
-	AddTorus(shader, 1, CVector3d(0, 1, 0), CMatrix4d());
-	AddTorus(shader, 0.5, CVector3d(2, 0, 0), CMatrix4d());
+	CMatrix4d a;
+	a.Translate(0, 0, 2);
+	a.Rotate(-90, 1, 0, 0);
+	AddTorus(shader, 1, 0.5, CVector3d(0, 0, -2), a);
+	
 }
 
 // Добавляем бесконечную шахматную плоскость y = 0
@@ -284,10 +287,10 @@ bool CRaytraceView::UpdateFrameBuffer()
 	return m_renderer.GetProgress(renderedChunks, totalChunks);
 }
 
-CSceneObject& CRaytraceView::AddTorus(IShader const& shader, double radius, CVector3d const& center, CMatrix4d const& transform)
+CSceneObject& CRaytraceView::AddTorus(IShader const& shader, double radius, double smallRadius, CVector3d const& center, CMatrix4d const& transform)
 {
 	const auto& Torus = *m_geometryObjects.emplace_back(
-		std::make_unique<CTorus>(radius, 0.2,center, transform));
+		std::make_unique<CTorus>(radius, smallRadius, center, transform));
 
 	return AddSceneObject(Torus, shader);
 }

@@ -3,16 +3,16 @@
 #include "Ray.h"
 #include "Intersection.h"
 
-CTorus::CTorus(double radius, double tubeRadius, CVector3d const& center, CMatrix4d const& transform)
+CTorus::CTorus(double radius, double smallRadius, CVector3d const& center, CMatrix4d const& transform)
 	:CGeometryObjectWithInitialTransformImpl(transform)
 	
 {
 	// Сфера заданного радиуса и с центром в заданной точке получается
 	// путем масштабирования и переносы базовой сферы (сфера радиуса 1 с центром в начале координат)
 	m_radius = radius;
-	m_smallRadius = tubeRadius;
+	m_smallRadius = smallRadius;
 	CMatrix4d initialTransform;
-	initialTransform.Translate(center.x, center.y, center.z + tubeRadius);
+	//initialTransform.Translate(center.x, center.y, center.z);
 	// Задаем начальную трансформацию базовой сферы
 	SetInitialTransform(initialTransform);
 }
