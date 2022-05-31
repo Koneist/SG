@@ -18,7 +18,8 @@
 #include "SimpleMaterial.h"
 #include "Sphere.h"
 #include "TriangleMesh.h"
-#include "CTorus.h"
+#include "Torus.h"
+#include "Paraboloid.h"
 
 CRaytraceView::CRaytraceView()
 	: m_pFrameBuffer(std::make_unique<CFrameBuffer>(800, 600))
@@ -28,16 +29,17 @@ CRaytraceView::CRaytraceView()
 	*/
 	m_scene.SetBackdropColor(CVector4f(1, 0, 1, 1));
 
-	AddSomePlane();
+	//AddSomePlane();
+	AddSomeParabaloid();
 	AddSomeTorus();
 
-	AddSomeSpheres();
+	//AddSomeSpheres();
 
-	AddSomeConicCylinders();
+	//AddSomeConicCylinders();
 
 	AddSomeLight();
 
-	AddSomeTetrahedron();
+	//AddSomeTetrahedron();
 
 	/*
 	Задаем параметры видового порта и матрицы проецирования в контексте визуализации
@@ -50,19 +52,92 @@ CRaytraceView::CRaytraceView()
 	// Задаем матрицу камеры
 	CMatrix4d modelView;
 	modelView.LoadLookAtRH(
-		0, 3, 7,
+		0, 2, 7,
 		0, 0, 0,
 		0, 1, 0);
 	m_context.SetModelViewMatrix(modelView);
 }
 
-void CRaytraceView::AddSomeTorus()
+void CRaytraceView::AddSomeParabaloid()
 {
 	CSimpleMaterial yellow;
 	yellow.SetDiffuseColor(CVector4f(1, 1, 0, 1));
-	CSimpleDiffuseShader& shader = CreateSimpleDiffuseShader(yellow);
-	AddTorus(shader, 1, CVector3d(0, 1, 0), CMatrix4d());
-	AddTorus(shader, 0.5, CVector3d(2, 0, 0), CMatrix4d());
+	CSimpleMaterial red;
+	red.SetDiffuseColor(CVector4f(1, 0, 0, 1));
+	CSimpleDiffuseShader& yellowShader = CreateSimpleDiffuseShader(yellow);
+	CSimpleDiffuseShader& redShader = CreateSimpleDiffuseShader(red);
+
+	CMatrix4d first = CMatrix4d();
+	first.Translate(-2, -2, 0);
+	first.Scale(1.5, 1.5, 1.5);
+	AddParabaloid(yellowShader, first);
+
+	CMatrix4d second = CMatrix4d();
+	second.Translate(-2, -0.5, 0);
+	second.Scale(1.1, 1.1, 1.1);
+	AddParabaloid(redShader, second);
+
+	CMatrix4d third = CMatrix4d();
+	third.Translate(-2, 0.6, 0);
+	third.Scale(0.7, 0.7, 0.7);
+	AddParabaloid(yellowShader, third);
+
+	CMatrix4d fourth = CMatrix4d();
+	fourth.Translate(-2, 1.3, 0);
+	fourth.Scale(0.3, 0.3, 0.3);
+	AddParabaloid(redShader, fourth);
+
+}
+
+void CRaytraceView::AddSomeTorus()
+{
+	CSimpleMaterial white;
+	white.SetDiffuseColor(CVector4f(1, 1, 1, 1));
+	CSimpleMaterial yellow;
+	yellow.SetDiffuseColor(CVector4f(1, 1, 0, 1));
+	CSimpleMaterial red;
+	red.SetDiffuseColor(CVector4f(1, 0, 0, 1));
+	CSimpleMaterial orange;
+	orange.SetDiffuseColor(CVector4f(1, 0.61, 0, 1));
+	CSimpleMaterial pink;
+	pink.SetDiffuseColor(CVector4f(0.97, 0.45, 0.65, 1));
+	CSimpleMaterial green;
+	green.SetDiffuseColor(CVector4f(0, 1, 0, 1));
+
+
+	//CSimpleDiffuseShader& shader = CreateSimpleDiffuseShader(yellow);
+
+	CMatrix4d first = CMatrix4d();
+	first.Translate(2, -2, 0);
+	first.Scale(1, 1, 1);
+	AddTorus(CreateSimpleDiffuseShader(white), 1, 0.4, first);
+
+	CMatrix4d second = CMatrix4d();
+	second.Translate(2, -1.4, 0);
+	second.Scale(0.9, 0.9, 0.9);
+	AddTorus(CreateSimpleDiffuseShader(red), 1, 0.4, second);
+
+	CMatrix4d third = CMatrix4d();
+	third.Translate(2, -0.8, 0);
+	third.Scale(0.8, 0.8, 0.8);
+	AddTorus(CreateSimpleDiffuseShader(green), 1, 0.4, third);
+
+	CMatrix4d fourth = CMatrix4d();
+	fourth.Translate(2, -0.25, 0);
+	fourth.Scale(0.7, 0.7, 0.7);
+	AddTorus(CreateSimpleDiffuseShader(pink), 1, 0.4, fourth);
+
+	CMatrix4d fifth = CMatrix4d();
+	fifth.Translate(2, 0.2, 0);
+	fifth.Scale(0.6, 0.6, 0.6);
+	AddTorus(CreateSimpleDiffuseShader(yellow), 1, 0.4, fifth);
+
+	CMatrix4d sixth = CMatrix4d();
+	sixth.Translate(2, 0.6, 0);
+	sixth.Scale(0.5, 0.5, 0.5);
+	AddTorus(CreateSimpleDiffuseShader(orange), 1, 0.4, sixth);
+	
+	AddSphere(CreateSimpleDiffuseShader(red), 0.5, CVector3d(2, 1.1, 0));
 }
 
 // Добавляем бесконечную шахматную плоскость y = 0
@@ -284,10 +359,18 @@ bool CRaytraceView::UpdateFrameBuffer()
 	return m_renderer.GetProgress(renderedChunks, totalChunks);
 }
 
-CSceneObject& CRaytraceView::AddTorus(IShader const& shader, double radius, CVector3d const& center, CMatrix4d const& transform)
+CSceneObject& CRaytraceView::AddParabaloid(IShader const& shader, CMatrix4d const& transform)
+{
+	const auto& parabaloid = *m_geometryObjects.emplace_back(
+		std::make_unique<CParaboloid>(transform));
+
+	return AddSceneObject(parabaloid, shader);
+}
+
+CSceneObject& CRaytraceView::AddTorus(IShader const& shader, double radius, double smallRadius, CMatrix4d const& transform)
 {
 	const auto& Torus = *m_geometryObjects.emplace_back(
-		std::make_unique<CTorus>(radius, 0.2,center, transform));
+		std::make_unique<CTorus>(radius, smallRadius, transform));
 
 	return AddSceneObject(Torus, shader);
 }

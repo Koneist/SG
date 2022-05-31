@@ -337,11 +337,13 @@
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="CheckerShader.cpp" />
     <ClCompile Include="ConicCylinder.cpp" />
-    <ClCompile Include="CTorus.cpp" />
+    <ClCompile Include="Torus.cpp" />
+    <ClCompile Include="Equation.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="OmniLightSource.cpp" />
+    <ClCompile Include="Paraboloid.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="RaytraceView.cpp" />
     <ClCompile Include="RenderContext.cpp" />
@@ -366,7 +368,8 @@
     <ClInclude Include="algebra.h" />
     <ClInclude Include="CheckerShader.h" />
     <ClInclude Include="ConicCylinder.h" />
-    <ClInclude Include="CTorus.h" />
+    <ClInclude Include="Torus.h" />
+    <ClInclude Include="Equation.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="FrameBufferColorBuffer.h" />
     <ClInclude Include="GeometryObjectImpl.h" />
@@ -384,6 +387,7 @@
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="Matrix_fwd.h" />
     <ClInclude Include="OmniLightSource.h" />
+    <ClInclude Include="Paraboloid.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RaytraceView.h" />

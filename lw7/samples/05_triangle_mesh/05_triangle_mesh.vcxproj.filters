@@ -69,7 +69,13 @@
     <ClCompile Include="ViewPort.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CTorus.cpp">
+    <ClCompile Include="Torus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Paraboloid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Equation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -197,10 +203,16 @@
     <ClInclude Include="ViewPort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CTorus.h">
+    <ClInclude Include="Torus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="algebra.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Paraboloid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Equation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
